@@ -10,6 +10,33 @@ function setClassVisibility(cssClass, visible) {
         cssClass.hide();
 };
 
+//Add new settings
+Hooks.once('ready', function () {
+    console.log('pinned-chat-message | ready to pinned-chat-message'); 
+
+  game.settings.register("pinned-chat-message", "minimalRoleToPinnedOther", {
+    name: "Minimal role to pinned other",
+    hint: "Minimal role to pinned chat message from other user",
+    default: CONST.USER_ROLES.GAMEMASTER,
+    choices: Object.entries(CONST.USER_ROLES).reduce(
+        //Generate object of role with id for value
+        (accumulator, [label, id]) => {
+            const capLabel = label[0].toUpperCase() + label.slice(1).toLowerCase()
+            const localizeLabel = game.i18n.localize(`USER.Role${capLabel}`)
+            accumulator[id] = localizeLabel; 
+            return accumulator
+        },
+          {}
+      ),
+    type: String,
+    scope: 'world',
+    config: true,
+    requiresReload: true,
+});
+
+
+})
+
 //Add chatlog type navigation
 Hooks.on("renderChatLog", async function (chatLog, html, user) {
     buttonDefault = $(`<a class="item active default" data-tab="default">${game.i18n.localize("TC.TABS.Default")}</a>`);
