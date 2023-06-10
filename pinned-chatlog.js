@@ -15,8 +15,8 @@ Hooks.once('ready', function () {
     console.log('pinned-chat-message | ready to pinned-chat-message'); 
 
   game.settings.register("pinned-chat-message", "minimalRoleToPinnedOther", {
-    name: "Minimal role to pinned other",
-    hint: "Minimal role to pinned chat message from other user",
+    name: game.i18n.localize('PCM.settings.minimalRole.name'),
+    hint: game.i18n.localize('PCM.settings.minimalRole.hint'),
     default: CONST.USER_ROLES.GAMEMASTER,
     choices: Object.entries(CONST.USER_ROLES).reduce(
         //Generate object of role with id for value

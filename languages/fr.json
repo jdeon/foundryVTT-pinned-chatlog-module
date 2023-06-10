@@ -1,4 +1,6 @@
 {
     "PCM.TABS.Default": "Défaut",
-    "PCM.TABS.Pinned": "Epinglés"
+    "PCM.TABS.Pinned": "Epinglés",
+    "PCM.settings.minimalRole.name": "Rôle minimal pour épingler les autres messages",
+    "PCM.settings.minimalRole.hint": "Rôle minimal pour épingler les messages des autres utilisateurs"
 }
