@@ -39,10 +39,10 @@ Hooks.once('ready', function () {
 
 //Add chatlog type navigation
 Hooks.on("renderChatLog", async function (chatLog, html, user) {
-    buttonDefault = $(`<a class="item active default" data-tab="default">${game.i18n.localize("TC.TABS.Default")}</a>`);
+    buttonDefault = $(`<a class="item active default" data-tab="default">${game.i18n.localize("PCM.TABS.Default")}</a>`);
     buttonDefault.on('click', (event) => selectDefaultTab(chatLog));
 
-    buttonPinned = $(`<a class="item pinned" data-tab="pinned">${game.i18n.localize("TC.TABS.Pinned")}</a>`);
+    buttonPinned = $(`<a class="item pinned" data-tab="pinned">${game.i18n.localize("PCM.TABS.Pinned")}</a>`);
     buttonPinned.on('click', (event) => selectPinnedTab(chatLog));
 
     let toPrepend = $('<nav class="pinnedchatlog tabs"></nav>');
