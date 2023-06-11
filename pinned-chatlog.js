@@ -2,39 +2,36 @@ let currentTab = "default";
 let buttonDefault;
 let buttonPinned;
 
-function setClassVisibility(cssClass, visible) {
-    if (visible) {
-        cssClass.removeClass("hardHide");
-        cssClass.show();
-    } else
-        cssClass.hide();
-};
+const s_EVENT_NAME = 'module.pinned-chat-message';
 
-//Add new settings
-Hooks.once('ready', function () {
-    console.log('pinned-chat-message | ready to pinned-chat-message'); 
+/***********************************
+ * HOOKS LISTENER
+********************************/
 
-  game.settings.register("pinned-chat-message", "minimalRoleToPinnedOther", {
-    name: game.i18n.localize('PCM.settings.minimalRole.name'),
-    hint: game.i18n.localize('PCM.settings.minimalRole.hint'),
-    default: CONST.USER_ROLES.GAMEMASTER,
-    choices: Object.entries(CONST.USER_ROLES).reduce(
-        //Generate object of role with id for value
-        (accumulator, [label, id]) => {
-            const capLabel = label[0].toUpperCase() + label.slice(1).toLowerCase()
-            const localizeLabel = game.i18n.localize(`USER.Role${capLabel}`)
-            accumulator[id] = localizeLabel; 
-            return accumulator
-        },
-          {}
-      ),
-    type: String,
-    scope: 'world',
-    config: true,
-    requiresReload: true,
-});
+Hooks.once('setup', function () {
+    console.log('pinned-chat-message | setup to pinned-chat-message'); 
 
+    game.settings.register("pinned-chat-message", "minimalRoleToPinnedOther", {
+        name: game.i18n.localize('PCM.settings.minimalRole.name'),
+        hint: game.i18n.localize('PCM.settings.minimalRole.hint'),
+        default: CONST.USER_ROLES.GAMEMASTER,
+        choices: Object.entries(CONST.USER_ROLES).reduce(
+            //Generate object of role with id for value
+            (accumulator, [label, id]) => {
+                const capLabel = label[0].toUpperCase() + label.slice(1).toLowerCase()
+                const localizeLabel = game.i18n.localize(`USER.Role${capLabel}`)
+                accumulator[id] = localizeLabel; 
+                return accumulator
+            },
+            {}
+        ),
+        type: String,
+        scope: 'world',
+        config: true,
+        requiresReload: true,
+    });
 
+    listenSocket()
 })
 
 //Add chatlog type navigation
@@ -50,6 +47,71 @@ Hooks.on("renderChatLog", async function (chatLog, html, user) {
     
     html.prepend(toPrepend);
 });
+
+Hooks.on("renderChatMessage", (chatMessage, html, data) => {
+    if(chatMessage.canUserModify(Users.instance.current,'update') 
+    || game.user.role >= game.settings.get("pinned-chat-message", "minimalRoleToPinnedOther")){
+        addButton(html, chatMessage);
+    }
+
+    if(chatMessage?.flags?.pinnedChat?.pinned){
+        html.addClass("pinned-message")
+    }
+
+    if (currentTab == "pinned" && !html.hasClass("pinned-message")) {
+        html.hide();
+    }
+});
+
+
+/***********************************
+ * SOKET SETTING
+********************************/
+function pinnedUnownedMessage(messageId){
+    game.socket.emit(s_EVENT_NAME, {
+      type: 'pinnedUnownedMessage',
+      payload: {messageId}
+   });
+  }
+  
+  /**
+  * Provides the main incoming message registration and distribution of socket messages on the receiving side.
+  */
+  function listenSocket()
+  {
+     game.socket.on(s_EVENT_NAME, (data) =>
+     {
+        if (typeof data !== 'object') { return; }
+  
+        //Only GM must update the chatMessage
+        if(!game.user.isGM){ return; }
+  
+        try
+        {
+           if (data.type === 'pinnedUnownedMessage' && data?.payload?.messageId) {
+            const chatMessage = ChatMessage.get(data.payload.messageId)
+            const btnPinned = $(`#btn-pinned-message-${chatMessage.id}`)
+
+            pinnedMessage(btnPinned, chatMessage)
+           }
+        }
+        catch (err)
+        {
+           console.error(err);
+        }
+     });
+  }
+
+/***********************************
+ * PRIVATE METHOD
+********************************/
+function setClassVisibility(cssClass, visible) {
+    if (visible) {
+        cssClass.removeClass("hardHide");
+        cssClass.show();
+    } else
+        cssClass.hide();
+};
 
 function selectDefaultTab(chatLog){
     currentTab = "default";
@@ -93,31 +155,27 @@ async function selectPinnedTab(chatLog){
     chatLog.scrollBottom(true)
 };
 
-Hooks.on("renderChatMessage", (chatMessage, html, data) => {
-    if(chatMessage.canUserModify(Users.instance.current,'update')){
-        addButton(html, chatMessage);
-    }
-
-    if(chatMessage?.flags?.pinnedChat?.pinned){
-        html.addClass("pinned-message")
-    }
-
-    if (currentTab == "pinned" && !html.hasClass("pinned-message")) {
-        html.hide();
-    }
-});
-
 function addButton(messageElement, chatMessage) {
     let messageMetadata = messageElement.find(".message-metadata")
     // Can't find it?
     if (messageMetadata.length != 1) {
         return;
     }
-    let button = $(`<a> <i class="fas"></i></a>`);//Example of circle fa-circle
-    button.on('click', (event) => pinnedMessage(button, chatMessage));
+    let button = $(`<a id='btn-pinned-message-${chatMessage.id}'> <i class="fas"></i></a>`);//Example of circle fa-circle
+    button.on('click', (event) => btnPinnedMessageClick(button, chatMessage));
     changeIcon(button, chatMessage.flags?.pinnedChat?.pinned);
     messageMetadata.append(button);
 };
+
+function btnPinnedMessageClick(button, chatMessage){
+    if(chatMessage.canUserModify(Users.instance.current,'update')){
+        pinnedMessage(button, chatMessage)
+    } else if(game.user.role >= game.settings.get("pinned-chat-message", "minimalRoleToPinnedOther")){
+        pinnedUnownedMessage(chatMessage.id)
+    } else {
+        ui.notifications.error(game.i18n.localize('PCM.error.cantPinned'))
+    }
+}
 
 function pinnedMessage(button, chatMessage){
     let pinned = chatMessage.flags?.pinnedChat?.pinned;
