@@ -37,10 +37,16 @@ Hooks.once('setup', function () {
     listenSocket()
 })
 
+Hooks.once('ready', function () {
+    console.log('pinned-chat-message | ready to pinned-chat-message'); 
+
+    buttonDefault.addClass('active')
+})
+
 //Add chatlog type navigation
 Hooks.on("renderChatLog", async function (chatLog, html, user) {
     //Add chat subtabs
-    buttonDefault = $(`<a class="item default active" data-tab="default">${game.i18n.localize("PCM.TABS.Default")}</a>`);
+    buttonDefault = $(`<a class="item default" data-tab="default">${game.i18n.localize("PCM.TABS.Default")}</a>`);
     buttonDefault.on('click', (event) => selectDefaultTab(chatLog));
 
     buttonPinned = $(`<a class="item pinned" data-tab="pinned">${game.i18n.localize("PCM.TABS.Pinned")}</a>`);
