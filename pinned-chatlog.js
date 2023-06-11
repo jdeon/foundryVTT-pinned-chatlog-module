@@ -201,11 +201,21 @@ function addButton(messageElement, chatMessage) {
     if (messageMetadata.length != 1) {
         return;
     }
-    let button = $(`<a> <i class="fas"></i></a>`);//Example of circle fa-circle
-    button.on('click', (event) => pinnedMessage(button, chatMessage));
+    let button = $(`<a id='btn-pinned-message-${chatMessage.id}'> <i class="fas"></i></a>`);//Example of circle fa-circle
+    button.on('click', (event) => btnPinnedMessageClick(button, chatMessage));
     changeIcon(button, chatMessage.flags?.pinnedChat?.pinned);
     messageMetadata.append(button);
 };
+
+function btnPinnedMessageClick(button, chatMessage){
+    if(chatMessage.canUserModify(Users.instance.current,'update')){
+        pinnedMessage(button, chatMessage)
+    } else if(game.user.role >= game.settings.get("pinned-chat-message", "minimalRoleToPinnedOther")){
+        pinnedUnownedMessage(chatMessage.id)
+    } else {
+        ui.notifications.error(game.i18n.localize('PCM.error.cantPinned'))
+    }
+}
 
 function pinnedMessage(button, chatMessage){
     let pinned = chatMessage.flags?.pinnedChat?.pinned;
