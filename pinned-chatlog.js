@@ -1,8 +1,11 @@
-let currentTab = "default";
+const s_EVENT_NAME = 'module.pinned-chat-message';
+const DEFAULT_TAB_NAME = 'default';
+const PINNED_TAB_NAME = 'pinned';
+
+let currentTab = DEFAULT_TAB_NAME;
 let buttonDefault;
 let buttonPinned;
-
-const s_EVENT_NAME = 'module.pinned-chat-message';
+let isChatTab = false;
 
 /***********************************
  * HOOKS LISTENER
@@ -11,7 +14,7 @@ const s_EVENT_NAME = 'module.pinned-chat-message';
 Hooks.once('setup', function () {
     console.log('pinned-chat-message | setup to pinned-chat-message'); 
 
-    game.settings.register("pinned-chat-message", "minimalRoleToPinnedOther", {
+    game.settings.register('pinned-chat-message', 'minimalRoleToPinnedOther', {
         name: game.i18n.localize('PCM.settings.minimalRole.name'),
         hint: game.i18n.localize('PCM.settings.minimalRole.hint'),
         default: CONST.USER_ROLES.GAMEMASTER,
@@ -36,7 +39,8 @@ Hooks.once('setup', function () {
 
 //Add chatlog type navigation
 Hooks.on("renderChatLog", async function (chatLog, html, user) {
-    buttonDefault = $(`<a class="item active default" data-tab="default">${game.i18n.localize("PCM.TABS.Default")}</a>`);
+    //Add chat subtabs
+    buttonDefault = $(`<a class="item default active" data-tab="default">${game.i18n.localize("PCM.TABS.Default")}</a>`);
     buttonDefault.on('click', (event) => selectDefaultTab(chatLog));
 
     buttonPinned = $(`<a class="item pinned" data-tab="pinned">${game.i18n.localize("PCM.TABS.Pinned")}</a>`);
@@ -46,6 +50,36 @@ Hooks.on("renderChatLog", async function (chatLog, html, user) {
     toPrepend.append(buttonDefault).append(buttonPinned);
     
     html.prepend(toPrepend);
+
+    //Check the activation of chat tab
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            const currentClassState = mutation.target.classList.contains('active')
+            if(!currentClassState){
+                isChatTab = false
+            } else if(!isChatTab && currentClassState){
+                //If we active the chat Tab we add the activation class on sub class
+                isChatTab = true
+                if(currentTab === DEFAULT_TAB_NAME){
+                    buttonDefault.addClass('active');
+                } else if (currentTab === PINNED_TAB_NAME){
+                    buttonPinned.addClass('active');
+                }
+            }
+        });
+    });
+
+    observer.observe(html[0], {
+        attributes: true,
+        attributeFilter: ['class']
+      });
+
+      /*
+      observer.observe(buttonDefault[0], {
+        attributes: true,
+        attributeFilter: ['class']
+      });
+      */
 });
 
 Hooks.on("renderChatMessage", (chatMessage, html, data) => {
@@ -58,7 +92,7 @@ Hooks.on("renderChatMessage", (chatMessage, html, data) => {
         html.addClass("pinned-message")
     }
 
-    if (currentTab == "pinned" && !html.hasClass("pinned-message")) {
+    if (currentTab === PINNED_TAB_NAME && !html.hasClass("pinned-message")) {
         html.hide();
     }
 });
@@ -113,8 +147,22 @@ function setClassVisibility(cssClass, visible) {
         cssClass.hide();
 };
 
+//Add chatlog type navigation
+Hooks.on("renderChatLog", async function (chatLog, html, user) {
+    buttonDefault = $(`<a class="item active default" data-tab="default">${game.i18n.localize("TC.TABS.Default")}</a>`);
+    buttonDefault.on('click', (event) => selectDefaultTab(chatLog));
+
+    buttonPinned = $(`<a class="item pinned" data-tab="pinned">${game.i18n.localize("TC.TABS.Pinned")}</a>`);
+    buttonPinned.on('click', (event) => selectPinnedTab(chatLog));
+
+    let toPrepend = $('<nav class="pinnedchatlog tabs"></nav>');
+    toPrepend.append(buttonDefault).append(buttonPinned);
+    
+    html.prepend(toPrepend);
+});
+
 function selectDefaultTab(chatLog){
-    currentTab = "default";
+    currentTab = DEFAULT_TAB_NAME;
     buttonDefault.addClass('active');
     buttonPinned.removeClass('active');
 
@@ -125,7 +173,7 @@ function selectDefaultTab(chatLog){
 };
 
 async function selectPinnedTab(chatLog){
-    currentTab = "pinned";
+    currentTab = PINNED_TAB_NAME;
     buttonPinned.addClass('active');
     buttonDefault.removeClass('active');
 
@@ -155,27 +203,31 @@ async function selectPinnedTab(chatLog){
     chatLog.scrollBottom(true)
 };
 
+Hooks.on("renderChatMessage", (chatMessage, html, data) => {
+    if(chatMessage.canUserModify(Users.instance.current,'update')){
+        addButton(html, chatMessage);
+    }
+
+    if(chatMessage?.flags?.pinnedChat?.pinned){
+        html.addClass("pinned-message")
+    }
+
+    if (currentTab == "pinned" && !html.hasClass("pinned-message")) {
+        html.hide();
+    }
+});
+
 function addButton(messageElement, chatMessage) {
     let messageMetadata = messageElement.find(".message-metadata")
     // Can't find it?
     if (messageMetadata.length != 1) {
         return;
     }
-    let button = $(`<a id='btn-pinned-message-${chatMessage.id}'> <i class="fas"></i></a>`);//Example of circle fa-circle
-    button.on('click', (event) => btnPinnedMessageClick(button, chatMessage));
+    let button = $(`<a> <i class="fas"></i></a>`);//Example of circle fa-circle
+    button.on('click', (event) => pinnedMessage(button, chatMessage));
     changeIcon(button, chatMessage.flags?.pinnedChat?.pinned);
     messageMetadata.append(button);
 };
-
-function btnPinnedMessageClick(button, chatMessage){
-    if(chatMessage.canUserModify(Users.instance.current,'update')){
-        pinnedMessage(button, chatMessage)
-    } else if(game.user.role >= game.settings.get("pinned-chat-message", "minimalRoleToPinnedOther")){
-        pinnedUnownedMessage(chatMessage.id)
-    } else {
-        ui.notifications.error(game.i18n.localize('PCM.error.cantPinned'))
-    }
-}
 
 function pinnedMessage(button, chatMessage){
     let pinned = chatMessage.flags?.pinnedChat?.pinned;
