@@ -147,20 +147,6 @@ function setClassVisibility(cssClass, visible) {
         cssClass.hide();
 };
 
-//Add chatlog type navigation
-Hooks.on("renderChatLog", async function (chatLog, html, user) {
-    buttonDefault = $(`<a class="item active default" data-tab="default">${game.i18n.localize("TC.TABS.Default")}</a>`);
-    buttonDefault.on('click', (event) => selectDefaultTab(chatLog));
-
-    buttonPinned = $(`<a class="item pinned" data-tab="pinned">${game.i18n.localize("TC.TABS.Pinned")}</a>`);
-    buttonPinned.on('click', (event) => selectPinnedTab(chatLog));
-
-    let toPrepend = $('<nav class="pinnedchatlog tabs"></nav>');
-    toPrepend.append(buttonDefault).append(buttonPinned);
-    
-    html.prepend(toPrepend);
-});
-
 function selectDefaultTab(chatLog){
     currentTab = DEFAULT_TAB_NAME;
     buttonDefault.addClass('active');
@@ -202,20 +188,6 @@ async function selectPinnedTab(chatLog){
     
     chatLog.scrollBottom(true)
 };
-
-Hooks.on("renderChatMessage", (chatMessage, html, data) => {
-    if(chatMessage.canUserModify(Users.instance.current,'update')){
-        addButton(html, chatMessage);
-    }
-
-    if(chatMessage?.flags?.pinnedChat?.pinned){
-        html.addClass("pinned-message")
-    }
-
-    if (currentTab == "pinned" && !html.hasClass("pinned-message")) {
-        html.hide();
-    }
-});
 
 function addButton(messageElement, chatMessage) {
     let messageMetadata = messageElement.find(".message-metadata")
