@@ -173,7 +173,7 @@ function btnPinnedMessageClick(button, chatMessage){
     } else if(game.user.role >= game.settings.get("pinned-chat-message", "minimalRoleToPinnedOther")){
         pinnedUnownedMessage(chatMessage.id)
     } else {
-        ui.notifications.error("You can pinned this message") //TODO localize
+        ui.notifications.error(game.i18n.localize('PCM.error.cantPinned'))
     }
 }
 
