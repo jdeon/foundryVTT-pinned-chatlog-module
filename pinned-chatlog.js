@@ -88,6 +88,12 @@ Hooks.on("renderChatMessage", (chatMessage, html, data) => {
     }
 
     if(chatMessage?.flags?.pinnedChat?.pinned){
+        const htmlMessage = $("#chat-log").find(`.pinned-tab-message[data-message-id="${chatMessage.id}"]`)
+        if(htmlMessage.length){
+            //Already generate message in pinned tab
+            htmlMessage.remove()
+        }
+
         html.addClass("pinned-message")
     }
 
@@ -152,7 +158,8 @@ function selectDefaultTab(chatLog){
     buttonPinned.removeClass('active');
 
     setClassVisibility($(".chat-message"), true);
-    $(".pinned-vue-message").remove();
+
+    $(".pinned-tab-message").remove();
 
     chatLog.scrollBottom(true)
 };
@@ -172,10 +179,15 @@ async function selectPinnedTab(chatLog){
     
     for ( let i=0; i<pinnedMessages.length; i++) {
         let pinnedMessage = pinnedMessages[i];
-        if (pinnedMessage.visible) continue;
+        if (!pinnedMessage.visible) continue;//isWisper or other hide message
+
+        const htmlMessage = log.find(`.message[data-message-id="${pinnedMessage.id}"]`)
+        if(htmlMessage.length) continue;//is already render
+
         pinnedMessage.logged = true;
         try {
             let messageHtml = await pinnedMessage.getHTML();
+            messageHtml.addClass('pinned-tab-message')
             htmlMessages.push(messageHtml);
         } catch (err) {
           err.message = `Pinned message ${pinnedMessage.id} failed to render: ${err})`;
