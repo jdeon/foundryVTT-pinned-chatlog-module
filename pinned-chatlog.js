@@ -2,13 +2,14 @@ let currentTab = "default";
 let buttonDefault;
 let buttonPinned;
 
+const s_EVENT_NAME = 'module.pinned-chat-message';
+
 /***********************************
  * HOOKS LISTENER
 ********************************/
 
-//Add new settings
-Hooks.once('ready', function () {
-    console.log('pinned-chat-message | ready to pinned-chat-message'); 
+Hooks.once('setup', function () {
+    console.log('pinned-chat-message | setup to pinned-chat-message'); 
 
     game.settings.register("pinned-chat-message", "minimalRoleToPinnedOther", {
         name: game.i18n.localize('PCM.settings.minimalRole.name'),
@@ -29,6 +30,8 @@ Hooks.once('ready', function () {
         config: true,
         requiresReload: true,
     });
+
+    listenSocket()
 })
 
 //Add chatlog type navigation
@@ -46,7 +49,8 @@ Hooks.on("renderChatLog", async function (chatLog, html, user) {
 });
 
 Hooks.on("renderChatMessage", (chatMessage, html, data) => {
-    if(chatMessage.canUserModify(Users.instance.current,'update')){
+    if(chatMessage.canUserModify(Users.instance.current,'update') 
+    || game.user.role >= game.settings.get("pinned-chat-message", "minimalRoleToPinnedOther")){
         addButton(html, chatMessage);
     }
 
@@ -63,7 +67,40 @@ Hooks.on("renderChatMessage", (chatMessage, html, data) => {
 /***********************************
  * SOKET SETTING
 ********************************/
-//TODO add soket emitter and listener
+function pinnedUnownedMessage(messageId){
+    game.socket.emit(s_EVENT_NAME, {
+      type: 'pinnedUnownedMessage',
+      payload: {messageId}
+   });
+  }
+  
+  /**
+  * Provides the main incoming message registration and distribution of socket messages on the receiving side.
+  */
+  function listenSocket()
+  {
+     game.socket.on(s_EVENT_NAME, (data) =>
+     {
+        if (typeof data !== 'object') { return; }
+  
+        //Only GM must update the chatMessage
+        if(!game.user.isGM){ return; }
+  
+        try
+        {
+           if (data.type === 'pinnedUnownedMessage' && data?.payload?.messageId) {
+            const chatMessage = ChatMessage.get(data.payload.messageId)
+            const btnPinned = $(`#btn-pinned-message-${chatMessage.id}`)
+
+            pinnedMessage(btnPinned, chatMessage)
+           }
+        }
+        catch (err)
+        {
+           console.error(err);
+        }
+     });
+  }
 
 /***********************************
  * PRIVATE METHOD
@@ -124,11 +161,21 @@ function addButton(messageElement, chatMessage) {
     if (messageMetadata.length != 1) {
         return;
     }
-    let button = $(`<a> <i class="fas"></i></a>`);//Example of circle fa-circle
-    button.on('click', (event) => pinnedMessage(button, chatMessage));
+    let button = $(`<a id='btn-pinned-message-${chatMessage.id}'> <i class="fas"></i></a>`);//Example of circle fa-circle
+    button.on('click', (event) => btnPinnedMessageClick(button, chatMessage));
     changeIcon(button, chatMessage.flags?.pinnedChat?.pinned);
     messageMetadata.append(button);
 };
+
+function btnPinnedMessageClick(button, chatMessage){
+    if(chatMessage.canUserModify(Users.instance.current,'update')){
+        pinnedMessage(button, chatMessage)
+    } else if(game.user.role >= game.settings.get("pinned-chat-message", "minimalRoleToPinnedOther")){
+        pinnedUnownedMessage(chatMessage.id)
+    } else {
+        ui.notifications.error("You can pinned this message") //TODO localize
+    }
+}
 
 function pinnedMessage(button, chatMessage){
     let pinned = chatMessage.flags?.pinnedChat?.pinned;
