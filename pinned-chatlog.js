@@ -163,15 +163,16 @@ async function selectPinnedTab(chatLog){
     buttonDefault.removeClass('active');
 
     setClassVisibility($(".chat-message"), false);
+    setClassVisibility($(".pinned-message"), true);
 
-    let pinnedMessages = game.messages.contents.filter(entry => undefined != entry.flags.pinnedChat && entry.flags.pinnedChat.pinned);
+    let pinnedMessages = game.messages.contents.filter(entry => entry.flags?.pinnedChat?.pinned);
 
     const log = $("#chat-log");
     let htmlMessages = [];
     
     for ( let i=0; i<pinnedMessages.length; i++) {
         let pinnedMessage = pinnedMessages[i];
-        if (!pinnedMessage.visible) continue;
+        if (pinnedMessage.visible) continue;
         pinnedMessage.logged = true;
         try {
             let messageHtml = await pinnedMessage.getHTML();
