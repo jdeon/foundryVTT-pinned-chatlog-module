@@ -79,13 +79,6 @@ Hooks.on("renderChatLog", async function (chatLog, html, user) {
         attributes: true,
         attributeFilter: ['class']
       });
-
-      /*
-      observer.observe(buttonDefault[0], {
-        attributes: true,
-        attributeFilter: ['class']
-      });
-      */
 });
 
 Hooks.on("renderChatMessage", (chatMessage, html, data) => {
