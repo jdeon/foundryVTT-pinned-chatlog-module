@@ -1,4 +1,7 @@
 {
-    "TC.TABS.Default": "Default",
-    "TC.TABS.Pinned": "Pinned"
+    "PCM.TABS.Default": "Default",
+    "PCM.TABS.Pinned": "Pinned",
+    "PCM.settings.minimalRole.name": "Minimal role to pinned other",
+    "PCM.settings.minimalRole.hint": "Minimal role to pinned chat message from other user",
+    "PCM.error.cantPinned" : "You can't pinned this message"
 }
