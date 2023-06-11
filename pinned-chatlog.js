@@ -2,39 +2,33 @@ let currentTab = "default";
 let buttonDefault;
 let buttonPinned;
 
-function setClassVisibility(cssClass, visible) {
-    if (visible) {
-        cssClass.removeClass("hardHide");
-        cssClass.show();
-    } else
-        cssClass.hide();
-};
+/***********************************
+ * HOOKS LISTENER
+********************************/
 
 //Add new settings
 Hooks.once('ready', function () {
     console.log('pinned-chat-message | ready to pinned-chat-message'); 
 
-  game.settings.register("pinned-chat-message", "minimalRoleToPinnedOther", {
-    name: game.i18n.localize('PCM.settings.minimalRole.name'),
-    hint: game.i18n.localize('PCM.settings.minimalRole.hint'),
-    default: CONST.USER_ROLES.GAMEMASTER,
-    choices: Object.entries(CONST.USER_ROLES).reduce(
-        //Generate object of role with id for value
-        (accumulator, [label, id]) => {
-            const capLabel = label[0].toUpperCase() + label.slice(1).toLowerCase()
-            const localizeLabel = game.i18n.localize(`USER.Role${capLabel}`)
-            accumulator[id] = localizeLabel; 
-            return accumulator
-        },
-          {}
-      ),
-    type: String,
-    scope: 'world',
-    config: true,
-    requiresReload: true,
-});
-
-
+    game.settings.register("pinned-chat-message", "minimalRoleToPinnedOther", {
+        name: game.i18n.localize('PCM.settings.minimalRole.name'),
+        hint: game.i18n.localize('PCM.settings.minimalRole.hint'),
+        default: CONST.USER_ROLES.GAMEMASTER,
+        choices: Object.entries(CONST.USER_ROLES).reduce(
+            //Generate object of role with id for value
+            (accumulator, [label, id]) => {
+                const capLabel = label[0].toUpperCase() + label.slice(1).toLowerCase()
+                const localizeLabel = game.i18n.localize(`USER.Role${capLabel}`)
+                accumulator[id] = localizeLabel; 
+                return accumulator
+            },
+            {}
+        ),
+        type: String,
+        scope: 'world',
+        config: true,
+        requiresReload: true,
+    });
 })
 
 //Add chatlog type navigation
@@ -50,6 +44,37 @@ Hooks.on("renderChatLog", async function (chatLog, html, user) {
     
     html.prepend(toPrepend);
 });
+
+Hooks.on("renderChatMessage", (chatMessage, html, data) => {
+    if(chatMessage.canUserModify(Users.instance.current,'update')){
+        addButton(html, chatMessage);
+    }
+
+    if(chatMessage?.flags?.pinnedChat?.pinned){
+        html.addClass("pinned-message")
+    }
+
+    if (currentTab == "pinned" && !html.hasClass("pinned-message")) {
+        html.hide();
+    }
+});
+
+
+/***********************************
+ * SOKET SETTING
+********************************/
+//TODO add soket emitter and listener
+
+/***********************************
+ * PRIVATE METHOD
+********************************/
+function setClassVisibility(cssClass, visible) {
+    if (visible) {
+        cssClass.removeClass("hardHide");
+        cssClass.show();
+    } else
+        cssClass.hide();
+};
 
 function selectDefaultTab(chatLog){
     currentTab = "default";
@@ -92,20 +117,6 @@ async function selectPinnedTab(chatLog){
     
     chatLog.scrollBottom(true)
 };
-
-Hooks.on("renderChatMessage", (chatMessage, html, data) => {
-    if(chatMessage.canUserModify(Users.instance.current,'update')){
-        addButton(html, chatMessage);
-    }
-
-    if(chatMessage?.flags?.pinnedChat?.pinned){
-        html.addClass("pinned-message")
-    }
-
-    if (currentTab == "pinned" && !html.hasClass("pinned-message")) {
-        html.hide();
-    }
-});
 
 function addButton(messageElement, chatMessage) {
     let messageMetadata = messageElement.find(".message-metadata")
