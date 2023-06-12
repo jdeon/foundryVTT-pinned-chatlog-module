@@ -42,6 +42,46 @@ Hooks.once('ready', function () {
     console.log(`${s_MODULE_NAME} | ready to ${s_MODULE_NAME}`); 
 
     buttonDefault.addClass('active')
+
+    game.modules.get(s_MODULE_NAME).api = {
+        pinnedMessage : (inputMessage) => {
+            let message
+            if(typeof inputMessage === 'string'){
+                message = ChatMessage.get(inputMessage)
+            } else if (inputMessage instanceof ChatMessage){
+                message = inputMessage
+            }
+
+            if(message){
+                pinnedMessage(message, true)
+            }
+        },
+        unpinnedMessage : (inputMessage) => {
+            let message
+            if(typeof inputMessage === 'string'){
+                message = ChatMessage.get(inputMessage)
+            } else if (inputMessage instanceof ChatMessage){
+                message = inputMessage
+            }
+
+            if(message){
+                pinnedMessage(message, false)
+            }
+        },
+
+        togglePinnedMessage : (inputMessage) => {
+            let message
+            if(typeof inputMessage === 'string'){
+                message = ChatMessage.get(inputMessage)
+            } else if (inputMessage instanceof ChatMessage){
+                message = inputMessage
+            }
+
+            if(message){
+                pinnedMessage(message)
+            }
+        }
+      };
 })
 
 //Add chatlog type navigation
