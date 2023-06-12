@@ -8,7 +8,7 @@ By default, you can only pinned message that you owned if you're are not GM. But
 
 
 ## API
-The expose 3 methode by api : game.modules.get('pinned-chat-message').api.methodXXX
+The expose 3 methods by api : game.modules.get('pinned-chat-message').api.methodXXX
 
 ### pinnedMessage
 ```game.modules.get('pinned-chat-message').api.pinnedMessage(inputChatMessage)```
