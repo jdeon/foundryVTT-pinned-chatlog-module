@@ -1,4 +1,7 @@
 {
-    "TC.TABS.Default": "Défaut",
-    "TC.TABS.Pinned": "Epingler"
+    "PCM.TABS.Default": "Défaut",
+    "PCM.TABS.Pinned": "Epinglés",
+    "PCM.settings.minimalRole.name": "Rôle minimal pour épingler les autres messages",
+    "PCM.settings.minimalRole.hint": "Rôle minimal pour épingler les messages des autres utilisateurs",
+    "PCM.error.cantPinned" : "Vous ne pouvez pas épingler ce message"
 }
