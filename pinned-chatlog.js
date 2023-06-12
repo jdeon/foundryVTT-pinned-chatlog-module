@@ -1,4 +1,5 @@
-const s_EVENT_NAME = 'module.pinned-chat-message';
+const s_MODULE_NAME = 'pinned-chat-message';
+const s_EVENT_NAME = `module.${s_MODULE_NAME}`;
 const DEFAULT_TAB_NAME = 'default';
 const PINNED_TAB_NAME = 'pinned';
 
@@ -12,9 +13,9 @@ let isChatTab = false;
 ********************************/
 
 Hooks.once('setup', function () {
-    console.log('pinned-chat-message | setup to pinned-chat-message'); 
+    console.log(`${s_MODULE_NAME} | setup to ${s_MODULE_NAME}`); 
 
-    game.settings.register('pinned-chat-message', 'minimalRoleToPinnedOther', {
+    game.settings.register(s_MODULE_NAME, 'minimalRoleToPinnedOther', {
         name: game.i18n.localize('PCM.settings.minimalRole.name'),
         hint: game.i18n.localize('PCM.settings.minimalRole.hint'),
         default: CONST.USER_ROLES.GAMEMASTER,
@@ -38,7 +39,7 @@ Hooks.once('setup', function () {
 })
 
 Hooks.once('ready', function () {
-    console.log('pinned-chat-message | ready to pinned-chat-message'); 
+    console.log(`${s_MODULE_NAME} | ready to ${s_MODULE_NAME}`); 
 
     buttonDefault.addClass('active')
 })
@@ -83,7 +84,7 @@ Hooks.on("renderChatLog", async function (chatLog, html, user) {
 
 Hooks.on("renderChatMessage", (chatMessage, html, data) => {
     if(chatMessage.canUserModify(Users.instance.current,'update') 
-    || game.user.role >= game.settings.get("pinned-chat-message", "minimalRoleToPinnedOther")){
+    || game.user.role >= game.settings.get(s_MODULE_NAME, "minimalRoleToPinnedOther")){
         addButton(html, chatMessage);
     }
 
@@ -106,10 +107,10 @@ Hooks.on("renderChatMessage", (chatMessage, html, data) => {
 /***********************************
  * SOKET SETTING
 ********************************/
-function pinnedUnownedMessage(messageId){
+function pinnedUnownedMessage(messageId, isPinned){
     game.socket.emit(s_EVENT_NAME, {
       type: 'pinnedUnownedMessage',
-      payload: {messageId}
+      payload: {messageId, isPinned}
    });
   }
   
@@ -129,9 +130,8 @@ function pinnedUnownedMessage(messageId){
         {
            if (data.type === 'pinnedUnownedMessage' && data?.payload?.messageId) {
             const chatMessage = ChatMessage.get(data.payload.messageId)
-            const btnPinned = $(`#btn-pinned-message-${chatMessage.id}`)
 
-            pinnedMessage(btnPinned, chatMessage)
+            pinnedMessageUpdate(chatMessage, data?.payload?.isPinned)
            }
         }
         catch (err)
@@ -208,29 +208,32 @@ function addButton(messageElement, chatMessage) {
         return;
     }
     let button = $(`<a id='btn-pinned-message-${chatMessage.id}'> <i class="fas"></i></a>`);//Example of circle fa-circle
-    button.on('click', (event) => btnPinnedMessageClick(button, chatMessage));
+    button.on('click', (event) => btnPinnedMessageClick(chatMessage));
     changeIcon(button, chatMessage.flags?.pinnedChat?.pinned);
     messageMetadata.append(button);
 };
 
-function btnPinnedMessageClick(button, chatMessage){
+function btnPinnedMessageClick(chatMessage){
+    pinnedMessage(chatMessage)
+}
+
+function pinnedMessage(chatMessage, isPinned){
     if(chatMessage.canUserModify(Users.instance.current,'update')){
-        pinnedMessage(button, chatMessage)
-    } else if(game.user.role >= game.settings.get("pinned-chat-message", "minimalRoleToPinnedOther")){
-        pinnedUnownedMessage(chatMessage.id)
+        pinnedMessageUpdate(chatMessage, isPinned)
+    } else if(game.user.role >= game.settings.get(s_MODULE_NAME, "minimalRoleToPinnedOther")){
+        pinnedUnownedMessage(chatMessage.id, isPinned)
     } else {
         ui.notifications.error(game.i18n.localize('PCM.error.cantPinned'))
     }
-}
+};
 
-function pinnedMessage(button, chatMessage){
-    let pinned = chatMessage.flags?.pinnedChat?.pinned;
+function pinnedMessageUpdate(chatMessage, isPinned){
+    if(isPinned === undefined){
+        //toggle pinned flag
+        isPinned = ! chatMessage.flags?.pinnedChat?.pinned
+    }
 
-    pinned = !pinned;
-
-    changeIcon(button, pinned);
-
-    chatMessage.update({ "flags.pinnedChat.pinned": pinned },{"diff" :true});
+    chatMessage.update({ "flags.pinnedChat.pinned": isPinned },{"diff" :true});
 };
 
 function changeIcon(button, isPinned){
