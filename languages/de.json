@@ -1,0 +1,7 @@
+{
+    "PCM.TABS.Default": "Standard",
+    "PCM.TABS.Pinned": "Angepinnt",
+    "PCM.settings.minimalRole.name": "Minimale Nutzerrolle zum Pinnen von Nachrichten anderer",
+    "PCM.settings.minimalRole.hint": "Minimale Nutzerrolle um die Chat-Nachrichten von anderen Nutzern zu pinnen",
+    "PCM.error.cantPinned" : "Sie können diese Nachricht nicht anpinnen"
+}
