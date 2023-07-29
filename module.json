@@ -3,7 +3,7 @@
 	"name": "pinned-chat-message",
 	"title": "Pinned chat message",
 	"description": "Pinned message to keep it in another chat (global).",
-	"version": "1.4.0",
+	"version": "1.5.0",
 	"compatibility": {
 		"minimum": "9",
 		"verified": "11.301"
@@ -21,6 +21,11 @@
 	],
 
 	"languages": [
+		{
+			"lang": "de",
+			"name": "Deutsch",
+			"path": "languages/de.json"
+		},
 		{
 			"lang": "en",
 			"name": "English",
