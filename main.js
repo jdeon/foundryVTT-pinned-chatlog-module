@@ -1,7 +1,7 @@
 import { pinnedApi } from "./script/api.js";
 import { pinnedMessageUpdate, addPinnedButton } from "./script/pinnedMessage.js";
 import { initTab, getCurrentTab, getCurrentTabId, PINNED_TAB_NAME } from "./script/pinnedTab.js";
-import { s_MODULE_NAME, s_EVENT_NAME, CLASS_PINNED_TAB_MESSAGE, CLASS_PINNED_MESSAGE } from "./script/utils.js"
+import { s_MODULE_NAME, s_EVENT_NAME, CLASS_PINNED_TAB_MESSAGE, CLASS_PINNED_MESSAGE, checkIsPinned } from "./script/utils.js"
 
 let isChatTab = false;
 
@@ -73,7 +73,7 @@ Hooks.on("renderChatMessage", (chatMessage, html, data) => {
         addPinnedButton(html, chatMessage);
     }
 
-    if(chatMessage?.flags?.pinnedChat?.pinned){
+    if(checkIsPinned(chatMessage)){
         const htmlMessage = $("#chat-log").find(`.${CLASS_PINNED_TAB_MESSAGE}[data-message-id="${chatMessage.id}"]`)
         if(htmlMessage.length){
             //Already generate message in pinned tab
@@ -105,7 +105,7 @@ Hooks.on("renderChatMessage", (chatMessage, html, data) => {
            if (data.type === 'pinnedUnownedMessage' && data?.payload?.messageId) {
             const chatMessage = ChatMessage.get(data.payload.messageId)
 
-            pinnedMessageUpdate(chatMessage, data?.payload?.isPinned)
+            pinnedMessageUpdate(chatMessage, data?.payload?.pinnedFor)
            }
         }
         catch (err)
