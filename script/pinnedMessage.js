@@ -1,20 +1,22 @@
-export function pinnedMessage(chatMessage, isPinned){
+import { checkIsPinned } from './utils.js'
+
+export function pinnedMessage(chatMessage, pinnedFor){
     if(chatMessage.canUserModify(Users.instance.current,'update')){
-        pinnedMessageUpdate(chatMessage, isPinned)
+        pinnedMessageUpdate(chatMessage, pinnedFor)
     } else if(game.user.role >= game.settings.get(s_MODULE_NAME, "minimalRoleToPinnedOther")){
-        pinnedUnownedMessage(chatMessage.id, isPinned)
+        pinnedUnownedMessage(chatMessage.id, pinnedFor)
     } else {
         ui.notifications.error(game.i18n.localize('PCM.error.cantPinned'))
     }
 };
 
-export function pinnedMessageUpdate(chatMessage, isPinned){
-    if(isPinned === undefined){
+export function pinnedMessageUpdate(chatMessage, pinnedFor){
+    if(pinnedFor === undefined){
         //toggle pinned flag
-        isPinned = ! chatMessage.flags?.pinnedChat?.pinned
+        pinnedFor = chatMessage.flags?.pinnedChat?.pinned == '' ? PINNED_FOR_ALL : ''
     }
 
-    chatMessage.update({ "flags.pinnedChat.pinned": isPinned },{"diff" :true});
+    chatMessage.update({ "flags.pinnedChat.pinned": pinnedFor },{"diff" :true});
 };
 
 export function addPinnedButton(messageElement, chatMessage) {
@@ -25,7 +27,7 @@ export function addPinnedButton(messageElement, chatMessage) {
     }
     let button = $(`<a id='btn-pinned-message-${chatMessage.id}'> <i class="fas"></i></a>`);//Example of circle fa-circle
     button.on('click', (event) => pinnedMessage(chatMessage));
-    changeIcon(button, chatMessage.flags?.pinnedChat?.pinned);
+    changeIcon(button, checkIsPinned(chatMessage));
     messageMetadata.append(button);
 };
 
@@ -44,9 +46,9 @@ function changeIcon(button, isPinned){
 /***********************************
  * SOKET SETTING
 ********************************/
-function pinnedUnownedMessage(messageId, isPinned){
+function pinnedUnownedMessage(messageId, pinnedFor){
     game.socket.emit(s_EVENT_NAME, {
       type: 'pinnedUnownedMessage',
-      payload: {messageId, isPinned}
+      payload: {messageId, pinnedFor}
    });
   }
