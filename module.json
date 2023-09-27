@@ -14,7 +14,7 @@
 		}
 	],
 	"esmodules": [
-		"./pinned-chatlog.js"
+		"./main.js"
 	],
 	"styles": [
 		"/styles/pinned-chatlog.css"
