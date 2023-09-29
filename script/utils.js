@@ -1,5 +1,5 @@
-export const s_MODULE_NAME = 'pinned-chat-message';
-export const s_EVENT_NAME = `module.${s_MODULE_NAME}`;
+export const s_MODULE_ID = 'pinned-chat-message';
+export const s_EVENT_NAME = `module.${s_MODULE_ID}`;
 export const PINNED_FOR_ALL = 'all'
 
 //CSS

@@ -3,7 +3,7 @@ import { checkIsPinned } from './utils.js'
 export function pinnedMessage(chatMessage, pinnedFor){
     if(chatMessage.canUserModify(Users.instance.current,'update')){
         pinnedMessageUpdate(chatMessage, pinnedFor)
-    } else if(game.user.role >= game.settings.get(s_MODULE_NAME, "minimalRoleToPinnedOther")){
+    } else if(game.user.role >= game.settings.get(s_MODULE_ID, "minimalRoleToPinnedOther")){
         pinnedUnownedMessage(chatMessage.id, pinnedFor)
     } else {
         ui.notifications.error(game.i18n.localize('PCM.error.cantPinned'))
