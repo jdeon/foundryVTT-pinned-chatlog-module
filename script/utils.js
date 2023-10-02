@@ -11,3 +11,20 @@ export const CLASS_PINNED_TAB_MESSAGE = 'pinned-tab-message'
 export function checkIsPinned(chatMessage){
     return chatMessage.flags?.pinnedChat?.pinned === PINNED_FOR_ALL
 }
+
+let isDoubleClick = false
+
+export function simpleClick(callBack){
+    setTimeout(() => {
+        if(!isDoubleClick){
+            callBack()
+        }
+}, 500)
+}
+
+export function doDoubleCheck(){
+    isDoubleClick = true
+    setTimeout(() => {
+        isDoubleClick = false
+    }, 1000)
+}

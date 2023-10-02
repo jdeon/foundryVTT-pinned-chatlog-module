@@ -1,4 +1,4 @@
-import { checkIsPinned } from './utils.js'
+import { checkIsPinned, simpleClick, doDoubleCheck, PINNED_FOR_ALL } from './utils.js'
 
 export function pinnedMessage(chatMessage, pinnedFor){
     if(chatMessage.canUserModify(Users.instance.current,'update')){
@@ -26,12 +26,22 @@ export function addPinnedButton(messageElement, chatMessage) {
         return;
     }
     let button = $(`<a id='btn-pinned-message-${chatMessage.id}'> <i class="fas"></i></a>`);//Example of circle fa-circle
-    button.on('click', (event) => pinnedMessage(chatMessage));
-    changeIcon(button, checkIsPinned(chatMessage));
+    button.on('click', () => pinnedButtonClick(chatMessage));
+    button.on('dblclick', () => selfPinnedMessage(chatMessage, game.user));
+    changeIcon(button, chatMessage.flags?.pinnedChat?.pinned);
     messageMetadata.append(button);
 };
 
 function changeIcon(button, isPinned){
+function pinnedButtonClick(chatMessage){
+    simpleClick(() => pinnedMessage(chatMessage) )
+}
+
+function selfPinnedMessage(chatMessage, user){
+    doDoubleCheck()
+    pinnedMessage(chatMessage, user.id)
+}
+
     let icon = button.find(".fas");
 
     if(isPinned){
@@ -51,4 +61,4 @@ function pinnedUnownedMessage(messageId, pinnedFor){
       type: 'pinnedUnownedMessage',
       payload: {messageId, pinnedFor}
    });
-  }
+}
