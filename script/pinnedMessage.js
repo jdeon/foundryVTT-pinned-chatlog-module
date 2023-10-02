@@ -32,7 +32,6 @@ export function addPinnedButton(messageElement, chatMessage) {
     messageMetadata.append(button);
 };
 
-function changeIcon(button, isPinned){
 function pinnedButtonClick(chatMessage){
     simpleClick(() => pinnedMessage(chatMessage) )
 }
@@ -42,11 +41,19 @@ function selfPinnedMessage(chatMessage, user){
     pinnedMessage(chatMessage, user.id)
 }
 
+function changeIcon(button, pinnedFor){
     let icon = button.find(".fas");
 
-    if(isPinned){
+    if(pinnedFor === PINNED_FOR_ALL){
         icon.removeClass('fa-map-pin');
         icon.addClass('fa-circle');
+    } else if (typeof pinnedFor === 'string' && pinnedFor !== ''){
+        const pinnedUser = game.users.find(user => user.id === pinnedFor)
+        if(pinnedUser){
+            icon.removeClass('fa-map-pin');
+            icon.addClass('fa-circle');
+            icon.css("color", pinnedUser.color)
+        }
     } else {
         icon.addClass('fa-map-pin');
         icon.removeClass('fa-circle');
