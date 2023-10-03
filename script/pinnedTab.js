@@ -6,6 +6,7 @@ export const PINNED_TAB_NAME = 'pinned';
 let currentTabId = DEFAULT_TAB_NAME;
 let buttonDefault
 let buttonPinned
+let checkboxSelfPinned
 
 /**
  * Add chat subtabs
@@ -19,10 +20,13 @@ export function initTab (html, chatLog){
     buttonPinned = $(`<a class="item pinned" data-tab="pinned">${game.i18n.localize("PCM.TABS.Pinned")}</a>`);
     buttonPinned.on('click', (event) => selectPinnedTab(chatLog));
 
+    checkboxSelfPinned = $(`<div style="flex: none;display: flex;"><input type="checkbox" id="selfPinned" name="selfPinned"><label for="selfPinned" style="display: flex;align-items: center;">selfPinned</label></div>`);
+    checkboxSelfPinned.on('change', ({target}) => console.log("check box value : " + target?.checked));
+
     let toPrepend = $('<nav class="pinnedchatlog tabs"></nav>');
     toPrepend.append(buttonDefault).append(buttonPinned);
     
-    html.prepend(toPrepend);
+    html.prepend(checkboxSelfPinned).prepend(toPrepend);
 }
 
 export function getCurrentTabId(){
