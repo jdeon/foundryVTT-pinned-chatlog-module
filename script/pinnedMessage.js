@@ -1,4 +1,4 @@
-import { checkIsPinned, simpleClick, doDoubleCheck, PINNED_FOR_ALL } from './utils.js'
+import { toggleArrayValue, simpleClick, doDoubleCheck, PINNED_FOR_ALL } from './utils.js'
 
 export function pinnedMessage(chatMessage, pinnedFor){
     if(chatMessage.canUserModify(Users.instance.current,'update')){
@@ -11,12 +11,34 @@ export function pinnedMessage(chatMessage, pinnedFor){
 };
 
 export function pinnedMessageUpdate(chatMessage, pinnedFor){
-    if(pinnedFor === undefined){
-        //toggle pinned flag
-        pinnedFor = chatMessage.flags?.pinnedChat?.pinned == '' ? PINNED_FOR_ALL : ''
+    let value
+
+    if(chatMessage.flags?.pinnedChat?.pinned === undefined){
+        value = []
+    } else {
+        value = chatMessage.flags.pinnedChat.pinned
     }
 
-    chatMessage.update({ "flags.pinnedChat.pinned": pinnedFor },{"diff" :true});
+    let needUpdate = true
+    if(pinnedFor?.target === undefined){
+        //toggle all pinned flag
+        toggleArrayValue(value, PINNED_FOR_ALL)
+    } else if (pinnedFor.active == undefined){
+        //toggle target pinned flag
+        toggleArrayValue(value, pinnedFor.target)
+    } else if (pinnedFor.active && !value.includes(pinnedFor.target)){
+        value.push(pinnedFor.target)
+    } else if (!pinnedFor.active && value.indexOf(pinnedFor.target) >= 0){
+        let index = value.indexOf(value);
+        value.splice(index, 1);
+    } else {
+        //dont update
+        needUpdate = false
+    }
+
+    if(needUpdate){
+        chatMessage.update({ "flags.pinnedChat.pinned": value },{"diff" :true});
+    }
 };
 
 export function addPinnedButton(messageElement, chatMessage) {
@@ -38,22 +60,19 @@ function pinnedButtonClick(chatMessage){
 
 function selfPinnedMessage(chatMessage, user){
     doDoubleCheck()
-    pinnedMessage(chatMessage, user.id)
+    pinnedMessage(chatMessage, {target : user.id})
 }
 
 function changeIcon(button, pinnedFor){
     let icon = button.find(".fas");
 
-    if(pinnedFor === PINNED_FOR_ALL){
+    if(pinnedFor?.includes(game.user.id)){
         icon.removeClass('fa-map-pin');
         icon.addClass('fa-circle');
-    } else if (typeof pinnedFor === 'string' && pinnedFor !== ''){
-        const pinnedUser = game.users.find(user => user.id === pinnedFor)
-        if(pinnedUser){
-            icon.removeClass('fa-map-pin');
-            icon.addClass('fa-circle');
-            icon.css("color", pinnedUser.color)
-        }
+        icon.css("color", game.user.color)
+    } else if(pinnedFor?.includes(PINNED_FOR_ALL)){
+        icon.removeClass('fa-map-pin');
+        icon.addClass('fa-circle');
     } else {
         icon.addClass('fa-map-pin');
         icon.removeClass('fa-circle');

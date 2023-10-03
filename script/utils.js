@@ -9,8 +9,25 @@ export const CLASS_PINNED_MESSAGE = 'pinned-message'
 export const CLASS_PINNED_TAB_MESSAGE = 'pinned-tab-message'
 
 export function checkIsPinned(chatMessage){
-    return chatMessage.flags?.pinnedChat?.pinned === PINNED_FOR_ALL
+    return chatMessage.flags?.pinnedChat?.pinned?.includes(PINNED_FOR_ALL)
+    || chatMessage.flags?.pinnedChat?.pinned?.includes(game.user.id)
 }
+
+/**
+ * Add value if it don't exist or remove it
+ * @param {T[]} array 
+ * @param T} value 
+ */
+export function toggleArrayValue (array, value) {
+    let index = array.indexOf(value);
+
+    if (index === -1) {
+        array.push(value);
+    } else {
+        array.splice(index, 1);
+    }
+}
+
 
 let isDoubleClick = false
 

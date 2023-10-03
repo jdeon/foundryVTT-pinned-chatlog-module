@@ -11,16 +11,16 @@ By default, you can only pinned message that you owned if you're are not GM. But
 The expose 3 methods by api : game.modules.get('pinned-chat-message').api.methodXXX
 
 ### pinnedMessage
-```game.modules.get('pinned-chat-message').api.pinnedMessage(inputChatMessage)```
+```game.modules.get('pinned-chat-message').api.pinnedMessage(inputChatMessage, userId)```
 Pinned the input message.
-The input message can be a chat message or his id
+The input message can be a chat message or his id and the id of the user for selfPinned
 
 ### unpinnedMessage
-```game.modules.get('pinned-chat-message').api.pinnedMessage(unpinnedMessage)```
+```game.modules.get('pinned-chat-message').api.pinnedMessage(unpinnedMessage, userId)```
 Unpinned the input message.
-The input message can be a chat message or his id
+The input message can be a chat message or his id and the id of the user for selfPinned
 
 ### togglePinnedMessage
-```game.modules.get('pinned-chat-message').api.togglePinnedMessage(inputChatMessage)```
+```game.modules.get('pinned-chat-message').api.togglePinnedMessage(inputChatMessage, userId)```
 Pinned an unpinned input message and unpinned a pinned input message.
-The input message can be a chat message or his id
+The input message can be a chat message or his id and the id of the user for selfPinned
