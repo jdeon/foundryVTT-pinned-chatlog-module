@@ -6,7 +6,7 @@ export const PINNED_TAB_NAME = 'pinned';
 let currentTabId = DEFAULT_TAB_NAME;
 let buttonDefault
 let buttonPinned
-let checkboxSelfPinned
+let divSelfPinned 
 
 /**
  * Add chat subtabs
@@ -20,13 +20,18 @@ export function initTab (html, chatLog){
     buttonPinned = $(`<a class="item pinned" data-tab="pinned">${game.i18n.localize("PCM.TABS.Pinned")}</a>`);
     buttonPinned.on('click', (event) => selectPinnedTab(chatLog));
 
-    checkboxSelfPinned = $(`<div style="flex: none;display: flex;"><input type="checkbox" id="selfPinned" name="selfPinned"><label for="selfPinned" style="display: flex;align-items: center;">selfPinned</label></div>`);
-    checkboxSelfPinned.on('change', ({target}) => console.log("check box value : " + target?.checked));
+    divSelfPinned  = $(`<div style="flex: none;display: none;"></div>`);
+    
+    let checkboxSelfPinned = $(`<input type="checkbox" id="selfPinned" name="selfPinned">`);
+    checkboxSelfPinned.on('change', ({target}) => console.log("check box value : " + target?.checked)); //TODO add method
+
+    divSelfPinned.append(checkboxSelfPinned).append(`<label for="selfPinned" style="display: flex;align-items: center;">selfPinned</label>`);
+    
 
     let toPrepend = $('<nav class="pinnedchatlog tabs"></nav>');
     toPrepend.append(buttonDefault).append(buttonPinned);
     
-    html.prepend(checkboxSelfPinned).prepend(toPrepend);
+    html.prepend(divSelfPinned).prepend(toPrepend);
 }
 
 export function getCurrentTabId(){
@@ -45,6 +50,7 @@ function selectDefaultTab(chatLog){
     currentTabId = DEFAULT_TAB_NAME;
     buttonDefault.addClass('active');
     buttonPinned.removeClass('active');
+    divSelfPinned.css("display", "none")
 
     setClassVisibility(CLASS_CHAT_MESSAGE, true);
 
@@ -57,6 +63,7 @@ async function selectPinnedTab(chatLog){
     currentTabId = PINNED_TAB_NAME;
     buttonPinned.addClass('active');
     buttonDefault.removeClass('active');
+    divSelfPinned.css("display", "flex")
 
     setClassVisibility(CLASS_CHAT_MESSAGE, false);
     setClassVisibility(CLASS_PINNED_MESSAGE, true);
