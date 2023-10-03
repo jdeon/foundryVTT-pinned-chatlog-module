@@ -31,10 +31,10 @@ function manageMigrationV2 (){
     
     game.messages.contents.forEach(chatMessage => {
         if(chatMessage.flags?.pinnedChat?.pinned === true){
-            chatMessage.update({ "flags.pinnedChat.pinned": PINNED_FOR_ALL },{"diff" :true})
+            chatMessage.update({ "flags.pinnedChat.pinned": [PINNED_FOR_ALL] },{"diff" :true})
             nbModif++
         } else if (chatMessage.flags?.pinnedChat?.pinned === false){
-            chatMessage.update({ "flags.pinnedChat.pinned": '' },{"diff" :true})
+            chatMessage.update({ "flags.pinnedChat.pinned": [] },{"diff" :true})
             nbModif++
         }
     });
