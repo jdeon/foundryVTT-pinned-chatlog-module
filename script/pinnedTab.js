@@ -6,7 +6,7 @@ export const PINNED_TAB_NAME = 'pinned';
 let currentTabId = DEFAULT_TAB_NAME;
 let buttonDefault
 let buttonPinned
-let divSelfPinned 
+let checkboxSelfPinned 
 
 /**
  * Add chat subtabs
@@ -20,10 +20,10 @@ export function initTab (html, chatLog){
     buttonPinned = $(`<a class="item pinned" data-tab="pinned">${game.i18n.localize("PCM.TABS.Pinned")}</a>`);
     buttonPinned.on('click', (event) => selectPinnedTab(chatLog));
 
-    divSelfPinned  = $(`<div style="flex: none;display: none;"></div>`);
+    let  divSelfPinned  = $(`<div style="flex: none;display: none;"></div>`);
     
-    let checkboxSelfPinned = $(`<input type="checkbox" id="selfPinned" name="selfPinned">`);
-    checkboxSelfPinned.on('change', ({target}) => console.log("check box value : " + target?.checked)); //TODO add method
+    checkboxSelfPinned = $(`<input type="checkbox" id="selfPinned" name="selfPinned">`);
+    checkboxSelfPinned.on('change', ({target}) => clickSelfPinnedCheckbox(target?.checked));
 
     divSelfPinned.append(checkboxSelfPinned).append(`<label for="selfPinned" style="display: flex;align-items: center;">selfPinned</label>`);
     
@@ -50,7 +50,7 @@ function selectDefaultTab(chatLog){
     currentTabId = DEFAULT_TAB_NAME;
     buttonDefault.addClass('active');
     buttonPinned.removeClass('active');
-    divSelfPinned.css("display", "none")
+    checkboxSelfPinned.parent().css("display", "none")
 
     setClassVisibility(CLASS_CHAT_MESSAGE, true);
 
@@ -63,7 +63,7 @@ async function selectPinnedTab(chatLog){
     currentTabId = PINNED_TAB_NAME;
     buttonPinned.addClass('active');
     buttonDefault.removeClass('active');
-    divSelfPinned.css("display", "flex")
+    checkboxSelfPinned.parent().css("display", "flex")
 
     setClassVisibility(CLASS_CHAT_MESSAGE, false);
     setClassVisibility(CLASS_PINNED_MESSAGE, true);
@@ -78,6 +78,17 @@ async function selectPinnedTab(chatLog){
         if (!pinnedMessage.visible) continue;//isWisper or other hide message
 
         const htmlMessage = log.find(`.message[data-message-id="${pinnedMessage.id}"]`)
+        
+        //Hide not self pinned message
+        if(checkboxSelfPinned.is(":checked") && checkIsPinned(pinnedMessage) !== ENUM_IS_PINNED_VALUE.self){
+            if(htmlMessage.length){
+                htmlMessage.hide()
+            }
+
+            continue;
+        }
+
+
         if(htmlMessage.length) continue;//is already render
 
         pinnedMessage.logged = true;
@@ -96,6 +107,10 @@ async function selectPinnedTab(chatLog){
     
     chatLog.scrollBottom(true)
 };
+
+function clickSelfPinnedCheckbox(value){
+
+}
 
 
 function setClassVisibility(cssClass, visible) {
