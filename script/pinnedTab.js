@@ -88,7 +88,6 @@ async function selectPinnedTab(chatLog){
             continue;
         }
 
-
         if(htmlMessage.length) continue;//is already render
 
         pinnedMessage.logged = true;
@@ -108,8 +107,23 @@ async function selectPinnedTab(chatLog){
     chatLog.scrollBottom(true)
 };
 
-function clickSelfPinnedCheckbox(value){
+function clickSelfPinnedCheckbox(isCheck){
+    setClassVisibility(CLASS_PINNED_MESSAGE, true);
 
+    if(isCheck){
+        //Hide not self pinned message
+        const pinnedMessagesToHide = game.messages.contents.filter(entry => checkIsPinned(entry) !== ENUM_IS_PINNED_VALUE.self);
+        const log = $("#chat-log");
+
+        for ( let i=0; i<pinnedMessagesToHide.length; i++) {
+            let pinnedMessage = pinnedMessagesToHide[i];
+    
+            const htmlMessage = log.find(`.message[data-message-id="${pinnedMessage.id}"]`)
+            if(htmlMessage.length){
+                htmlMessage.hide()
+            }
+        }
+    }
 }
 
 
