@@ -8,10 +8,27 @@ export const CLASS_CHAT_MESSAGE = 'chat-message'
 export const CLASS_PINNED_MESSAGE = 'pinned-message'
 export const CLASS_PINNED_TAB_MESSAGE = 'pinned-tab-message'
 
-export function checkIsPinned(chatMessage){
-    return chatMessage.flags?.pinnedChat?.pinned?.includes(PINNED_FOR_ALL)
-    || chatMessage.flags?.pinnedChat?.pinned?.includes(game.user.id)
+export const ENUM_IS_PINNED_VALUE = {
+    none : 0,
+    all : 1,
+    self : 2
 }
+
+/**
+ * 
+ * @param {*} chatMessage 
+ * @returns ENUM_IS_PINNED_VALUE
+ */
+export function checkIsPinned(chatMessage){
+    if(chatMessage.flags?.pinnedChat?.pinned?.includes(game.user.id)){
+        return ENUM_IS_PINNED_VALUE.self
+    } else if (chatMessage.flags?.pinnedChat?.pinned?.includes(PINNED_FOR_ALL)){
+        return ENUM_IS_PINNED_VALUE.all
+    } 
+    
+    return ENUM_IS_PINNED_VALUE.none
+}
+
 
 /**
  * Add value if it don't exist or remove it
