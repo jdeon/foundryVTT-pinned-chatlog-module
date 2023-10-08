@@ -2,7 +2,7 @@ import { pinnedApi } from "./script/api.js";
 import { addMigrationSettings, migrateModule } from "./script/migrationManager.js"
 import { pinnedMessageUpdate, addPinnedButton } from "./script/pinnedMessage.js";
 import { initTab, getCurrentTab, getCurrentTabId, PINNED_TAB_NAME } from "./script/pinnedTab.js";
-import { s_MODULE_ID, s_EVENT_NAME, CLASS_PINNED_TAB_MESSAGE, CLASS_PINNED_MESSAGE, checkIsPinned } from "./script/utils.js"
+import { s_MODULE_ID, s_EVENT_NAME, CLASS_PINNED_TAB_MESSAGE, CLASS_PINNED_MESSAGE, ENUM_IS_PINNED_VALUE, checkIsPinned } from "./script/utils.js"
 
 let isChatTab = false;
 
@@ -78,7 +78,7 @@ Hooks.on("renderChatMessage", (chatMessage, html, data) => {
         addPinnedButton(html, chatMessage);
     }
 
-    if(checkIsPinned(chatMessage)){
+    if(checkIsPinned(chatMessage) !== ENUM_IS_PINNED_VALUE.none){
         const htmlMessage = $("#chat-log").find(`.${CLASS_PINNED_TAB_MESSAGE}[data-message-id="${chatMessage.id}"]`)
         if(htmlMessage.length){
             //Already generate message in pinned tab

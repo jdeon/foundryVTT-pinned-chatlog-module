@@ -1,4 +1,4 @@
-import { CLASS_HARD_HIDE, CLASS_CHAT_MESSAGE, CLASS_PINNED_MESSAGE, CLASS_PINNED_TAB_MESSAGE, checkIsPinned } from './utils.js'
+import { CLASS_HARD_HIDE, CLASS_CHAT_MESSAGE, CLASS_PINNED_MESSAGE, CLASS_PINNED_TAB_MESSAGE, ENUM_IS_PINNED_VALUE, checkIsPinned } from './utils.js'
 
 export const DEFAULT_TAB_NAME = 'default';
 export const PINNED_TAB_NAME = 'pinned';
@@ -68,7 +68,7 @@ async function selectPinnedTab(chatLog){
     setClassVisibility(CLASS_CHAT_MESSAGE, false);
     setClassVisibility(CLASS_PINNED_MESSAGE, true);
 
-    let pinnedMessages = game.messages.contents.filter(entry => checkIsPinned(entry));
+    let pinnedMessages = game.messages.contents.filter(entry => checkIsPinned(entry) !== ENUM_IS_PINNED_VALUE.none);
 
     const log = $("#chat-log");
     let htmlMessages = [];
