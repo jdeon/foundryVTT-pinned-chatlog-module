@@ -1,4 +1,4 @@
-import { toggleArrayValue, simpleClick, doDoubleCheck, PINNED_FOR_ALL } from './utils.js'
+import { toggleArrayValue, simpleClick, doDoubleCheck, s_MODULE_ID, s_EVENT_NAME, PINNED_FOR_ALL } from './utils.js'
 
 export function pinnedMessage(chatMessage, pinnedFor){
     if(chatMessage.canUserModify(Users.instance.current,'update')){
