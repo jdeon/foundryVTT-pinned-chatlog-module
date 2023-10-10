@@ -1,8 +1,18 @@
 # foundryVTT-pinned-chatlog-module
 Module for Foundry VTT. It add another chatlog for pinned message to pinned some chat message in another chatlog in foundry VTT
 
-![image](https://user-images.githubusercontent.com/18675690/176022808-fddf162a-aa87-4231-92a4-67145a842b4d.png)
+![image](doc/Default-tab.png)
 
+If you double click on a message pin, it s gonna pin the message only for you. The self pinned icon get the color of the user.
+
+In the pinned tab you can use a use the check box to show only the self pinned message
+
+![image](doc/Pinned-tab.png)
+
+![image](doc/Pinned-tab-check.png)
+
+
+## Settings
 
 By default, you can only pinned message that you owned if you're are not GM. But it can be change in the settings
 
