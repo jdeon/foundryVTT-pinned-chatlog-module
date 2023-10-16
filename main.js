@@ -1,7 +1,8 @@
 import { pinnedApi } from "./script/api.js";
+import { addMigrationSettings, migrateModule } from "./script/migrationManager.js"
 import { pinnedMessageUpdate, addPinnedButton } from "./script/pinnedMessage.js";
 import { initTab, getCurrentTab, getCurrentTabId, PINNED_TAB_NAME } from "./script/pinnedTab.js";
-import { s_MODULE_NAME, s_EVENT_NAME, CLASS_PINNED_TAB_MESSAGE, CLASS_PINNED_MESSAGE } from "./script/utils.js"
+import { s_MODULE_ID, s_EVENT_NAME, CLASS_PINNED_TAB_MESSAGE, CLASS_PINNED_MESSAGE, ENUM_IS_PINNED_VALUE, checkIsPinned } from "./script/utils.js"
 
 let isChatTab = false;
 
@@ -10,9 +11,9 @@ let isChatTab = false;
 ********************************/
 
 Hooks.once('setup', function () {
-    console.log(`${s_MODULE_NAME} | setup to ${s_MODULE_NAME}`); 
+    console.log(`${s_MODULE_ID} | setup to ${s_MODULE_ID}`); 
 
-    game.settings.register(s_MODULE_NAME, 'minimalRoleToPinnedOther', {
+    game.settings.register(s_MODULE_ID, 'minimalRoleToPinnedOther', {
         name: game.i18n.localize('PCM.settings.minimalRole.name'),
         hint: game.i18n.localize('PCM.settings.minimalRole.hint'),
         default: CONST.USER_ROLES.GAMEMASTER,
@@ -32,15 +33,19 @@ Hooks.once('setup', function () {
         requiresReload: true,
     });
 
+    addMigrationSettings()
+
     listenSocket()
 })
 
 Hooks.once('ready', function () {
-    console.log(`${s_MODULE_NAME} | ready to ${s_MODULE_NAME}`); 
+    console.log(`${s_MODULE_ID} | ready to ${s_MODULE_ID}`); 
 
     getCurrentTab().addClass('active')
 
-    game.modules.get(s_MODULE_NAME).api = pinnedApi
+    migrateModule()
+
+    game.modules.get(s_MODULE_ID).api = pinnedApi
 })
 
 //Add chatlog type navigation
@@ -69,11 +74,11 @@ Hooks.on("renderChatLog", async function (chatLog, html, user) {
 
 Hooks.on("renderChatMessage", (chatMessage, html, data) => {
     if(chatMessage.canUserModify(Users.instance.current,'update') 
-    || game.user.role >= game.settings.get(s_MODULE_NAME, "minimalRoleToPinnedOther")){
+    || game.user.role >= game.settings.get(s_MODULE_ID, "minimalRoleToPinnedOther")){
         addPinnedButton(html, chatMessage);
     }
 
-    if(chatMessage?.flags?.pinnedChat?.pinned){
+    if(checkIsPinned(chatMessage) !== ENUM_IS_PINNED_VALUE.none){
         const htmlMessage = $("#chat-log").find(`.${CLASS_PINNED_TAB_MESSAGE}[data-message-id="${chatMessage.id}"]`)
         if(htmlMessage.length){
             //Already generate message in pinned tab
@@ -105,7 +110,7 @@ Hooks.on("renderChatMessage", (chatMessage, html, data) => {
            if (data.type === 'pinnedUnownedMessage' && data?.payload?.messageId) {
             const chatMessage = ChatMessage.get(data.payload.messageId)
 
-            pinnedMessageUpdate(chatMessage, data?.payload?.isPinned)
+            pinnedMessageUpdate(chatMessage, data?.payload?.pinnedFor)
            }
         }
         catch (err)
