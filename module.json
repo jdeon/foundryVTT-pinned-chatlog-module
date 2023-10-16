@@ -3,10 +3,10 @@
 	"name": "pinned-chat-message",
 	"title": "Pinned chat message",
 	"description": "Pinned message to keep it in another chat (global).",
-	"version": "1.5.0",
+	"version": "2.0.0",
 	"compatibility": {
 		"minimum": "9",
-		"verified": "11.301"
+		"verified": "11.302"
 	},
 	"authors": [
 		{
@@ -14,7 +14,7 @@
 		}
 	],
 	"esmodules": [
-		"./pinned-chatlog.js"
+		"./main.js"
 	],
 	"styles": [
 		"/styles/pinned-chatlog.css"
