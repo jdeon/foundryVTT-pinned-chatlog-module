@@ -25,7 +25,7 @@ export function initTab (html, chatLog){
     checkboxSelfPinned = $(`<input type="checkbox" id="selfPinned" name="selfPinned">`);
     checkboxSelfPinned.on('change', ({target}) => clickSelfPinnedCheckbox(target?.checked));
 
-    divSelfPinned.append(checkboxSelfPinned).append(`<label for="selfPinned" style="display: flex;align-items: center;">selfPinned</label>`);
+    divSelfPinned.append(checkboxSelfPinned).append(`<label for="selfPinned" style="display: flex;align-items: center;">${game.i18n.localize("PCM.TABS.SeflPinnedChekkbox")}</label>`);
     
 
     let toPrepend = $('<nav class="pinnedchatlog tabs"></nav>');

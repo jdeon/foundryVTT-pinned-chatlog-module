@@ -1,6 +1,7 @@
 {
     "PCM.TABS.Default": "Default",
     "PCM.TABS.Pinned": "Pinned",
+    "PCM.TABS.SeflPinnedChekkbox":"Self pinned only",
     "PCM.settings.minimalRole.name": "Minimal role to pin others' messages",
     "PCM.settings.minimalRole.hint": "Minimal role to pin the chat message of another user",
     "PCM.error.cantPinned" : "You can't pin this message"
