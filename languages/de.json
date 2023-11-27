@@ -6,5 +6,6 @@
     "PCM.settings.minimalRole.hint": "Minimale Nutzerrolle um die Chat-Nachrichten von anderen Nutzern zu pinnen",
     "PCM.error.cantPinned" : "Sie können diese Nachricht nicht anpinnen",
     "PCM.allPin": "Pin für alle",
-    "PCM.selfPin": "Pin selbst"
+    "PCM.selfPin": "Pin selbst",
+    "PCM.unPin": "Lösen"
 }

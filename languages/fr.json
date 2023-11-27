@@ -6,5 +6,6 @@
     "PCM.settings.minimalRole.hint": "Rôle minimal pour épingler les messages des autres utilisateurs",
     "PCM.error.cantPinned" : "Vous ne pouvez pas épingler ce message",
     "PCM.allPin": "Epingler pour tous",
-    "PCM.selfPin": "Epingler pour soi"
+    "PCM.selfPin": "Epingler pour soi",
+    "PCM.unPin": "Désépingler"
 }

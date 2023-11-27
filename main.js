@@ -2,7 +2,7 @@ import { pinnedApi } from "./script/api.js";
 import { addMigrationSettings, migrateModule } from "./script/migrationManager.js"
 import { pinnedMessageUpdate, addPinnedButton, pinnedMessage } from "./script/pinnedMessage.js";
 import { initTab, getCurrentTab, getCurrentTabId, PINNED_TAB_NAME } from "./script/pinnedTab.js";
-import { s_MODULE_ID, s_EVENT_NAME, CLASS_PINNED_TAB_MESSAGE, CLASS_PINNED_MESSAGE, ENUM_IS_PINNED_VALUE, checkIsPinned, allowToPinMessage } from "./script/utils.js"
+import { s_MODULE_ID, s_EVENT_NAME, CLASS_PINNED_TAB_MESSAGE, CLASS_PINNED_MESSAGE, ENUM_IS_PINNED_VALUE, PINNED_FOR_ALL, checkIsPinned, allowToPinMessage } from "./script/utils.js"
 
 let isChatTab = false;
 
@@ -121,6 +121,22 @@ Hooks.on('getChatLogEntryContext', (_chatLogApp, entries) => {
             pinnedMessage(chatMessage, {target : game.user.id})
         },
       },
+      {
+        name: game.i18n.localize('PCM.unPin'),
+        icon: '<i class="fas fa-map-pin"></i>',
+        condition: (li) => {
+            const chatMessage = getmessage(li);
+            return checkIsPinned(chatMessage) !== ENUM_IS_PINNED_VALUE.none && allowToPinMessage(chatMessage);
+        },
+        callback: async (li) => {
+            const chatMessage = getmessage(li);
+            if(checkIsPinned(chatMessage) === ENUM_IS_PINNED_VALUE.self){
+                pinnedMessage(chatMessage, {target : game.user.id, active:false})
+            } else if (checkIsPinned(chatMessage) === ENUM_IS_PINNED_VALUE.all){
+                pinnedMessage(chatMessage, {target : PINNED_FOR_ALL, active:false})
+            }
+        },
+      }
     );
   });
   
