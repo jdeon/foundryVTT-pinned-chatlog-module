@@ -1,8 +1,8 @@
 import { pinnedApi } from "./script/api.js";
 import { addMigrationSettings, migrateModule } from "./script/migrationManager.js"
-import { pinnedMessageUpdate, addPinnedButton } from "./script/pinnedMessage.js";
+import { pinnedMessageUpdate, addPinnedButton, pinnedMessage } from "./script/pinnedMessage.js";
 import { initTab, getCurrentTab, getCurrentTabId, PINNED_TAB_NAME } from "./script/pinnedTab.js";
-import { s_MODULE_ID, s_EVENT_NAME, CLASS_PINNED_TAB_MESSAGE, CLASS_PINNED_MESSAGE, ENUM_IS_PINNED_VALUE, checkIsPinned } from "./script/utils.js"
+import { s_MODULE_ID, s_EVENT_NAME, CLASS_PINNED_TAB_MESSAGE, CLASS_PINNED_MESSAGE, ENUM_IS_PINNED_VALUE, checkIsPinned, allowToPinMessage } from "./script/utils.js"
 
 let isChatTab = false;
 
@@ -92,6 +92,25 @@ Hooks.on("renderChatMessage", (chatMessage, html, data) => {
         html.hide();
     }
 });
+
+Hooks.on('getChatLogEntryContext', (_chatLogApp, entries) => {
+    const getmessage = (li) => game.messages.get(li.data('messageId'))
+  
+    entries.unshift(
+      {
+        name:  game.i18n.localize('PCM.allPin'),
+        icon: '<i class="fas fa-map-pin"></i>',
+        condition: (li) => {
+          const chatMessage = getmessage(li);
+          return checkIsPinned(chatMessage) !== ENUM_IS_PINNED_VALUE.all && allowToPinMessage(chatMessage);
+        },
+        callback: async (li) => {
+          const chatMessage = getmessage(li);
+          pinnedMessage(chatMessage)
+        }
+      }
+    );
+  });
   
   /**
   * Provides the main incoming message registration and distribution of socket messages on the receiving side.

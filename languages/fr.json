@@ -4,5 +4,6 @@
     "PCM.TABS.SeflPinnedChekkbox": "Perso uniquement",
     "PCM.settings.minimalRole.name": "Rôle minimal pour épingler les autres messages",
     "PCM.settings.minimalRole.hint": "Rôle minimal pour épingler les messages des autres utilisateurs",
-    "PCM.error.cantPinned" : "Vous ne pouvez pas épingler ce message"
+    "PCM.error.cantPinned" : "Vous ne pouvez pas épingler ce message",
+    "PCM.allPin": "Epingler pour tous"
 }

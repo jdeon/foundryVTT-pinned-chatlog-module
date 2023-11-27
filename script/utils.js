@@ -29,6 +29,11 @@ export function checkIsPinned(chatMessage){
     return ENUM_IS_PINNED_VALUE.none
 }
 
+export function allowToPinMessage(chatMessage){
+    return chatMessage.canUserModify(Users.instance.current,'update')
+        || game.user.role >= game.settings.get(s_MODULE_ID, "minimalRoleToPinnedOther")
+}
+
 
 /**
  * Add value if it don't exist or remove it
