@@ -108,7 +108,19 @@ Hooks.on('getChatLogEntryContext', (_chatLogApp, entries) => {
           const chatMessage = getmessage(li);
           pinnedMessage(chatMessage)
         }
-      }
+      },
+      {
+        name:  game.i18n.localize('PCM.selfPin'),
+        icon: '<i class="fas fa-map-pin"></i>',
+        condition: (li) => {
+            const chatMessage = getmessage(li);
+            return checkIsPinned(chatMessage) !== ENUM_IS_PINNED_VALUE.self && allowToPinMessage(chatMessage);
+        },
+        callback: async (li) => {
+            const chatMessage = getmessage(li);
+            pinnedMessage(chatMessage, {target : game.user.id})
+        },
+      },
     );
   });
   
