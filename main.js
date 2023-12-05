@@ -33,6 +33,16 @@ Hooks.once('setup', function () {
         requiresReload: true,
     });
 
+    game.settings.register(s_MODULE_ID, 'disablePinForAll', {
+        name: game.i18n.localize('PCM.settings.disablePinForAll.name'),
+        hint: game.i18n.localize('PCM.settings.disablePinForAll.hint'),
+        default: false,
+        type: Boolean,
+        scope: 'world',
+        config: true,
+        requiresReload: true,
+    });
+
     addMigrationSettings()
 
     listenSocket()

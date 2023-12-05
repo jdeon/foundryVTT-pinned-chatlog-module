@@ -49,17 +49,27 @@ export function addPinnedButton(messageElement, chatMessage) {
     }
     let button = $(`<a id='btn-pinned-message-${chatMessage.id}'> <i class="fas"></i></a>`);//Example of circle fa-circle
     button.on('click', () => pinnedButtonClick(chatMessage));
-    button.on('dblclick', () => selfPinnedMessage(chatMessage, game.user));
+    button.on('dblclick', () => pinnedButtonDblClick(chatMessage, game.user));
     changeIcon(button, chatMessage.flags?.pinnedChat?.pinned);
     messageMetadata.append(button);
 };
 
 function pinnedButtonClick(chatMessage){
-    simpleClick(() => pinnedMessage(chatMessage) )
+    simpleClick(() => {
+        if (game.user.isGM || game.settings.get(s_MODULE_ID, 'disablePinForAll')){
+            pinnedMessage(chatMessage) 
+        } else {
+            selfPinnedMessage(chatMessage, game.user)
+        }
+    })
+}
+
+function pinnedButtonDblClick(chatMessage, user){
+    doDoubleCheck()
+    selfPinnedMessage(chatMessage, user)
 }
 
 function selfPinnedMessage(chatMessage, user){
-    doDoubleCheck()
     pinnedMessage(chatMessage, {target : user.id})
 }
 
