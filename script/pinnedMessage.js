@@ -56,9 +56,9 @@ export function addPinnedButton(messageElement, chatMessage) {
 
 function pinnedButtonClick(chatMessage){
     simpleClick(() => {
-        if (game.user.isGM || game.settings.get(s_MODULE_ID, 'disablePinForAll')){
+        if (game.user.isGM || !game.settings.get(s_MODULE_ID, 'disablePinForAll')){
             pinnedMessage(chatMessage) 
-        } else {
+        } else if(!game.settings.get(s_MODULE_ID, 'disableSelfPin')){
             selfPinnedMessage(chatMessage, game.user)
         }
     })
@@ -66,7 +66,11 @@ function pinnedButtonClick(chatMessage){
 
 function pinnedButtonDblClick(chatMessage, user){
     doDoubleCheck()
-    selfPinnedMessage(chatMessage, user)
+    if (game.user.isGM || !game.settings.get(s_MODULE_ID, 'disableSelfPin')){
+        selfPinnedMessage(chatMessage, user)
+    } else if(!game.settings.get(s_MODULE_ID, 'disablePinForAll')){
+        pinnedMessage(chatMessage) 
+    }
 }
 
 function selfPinnedMessage(chatMessage, user){

@@ -43,6 +43,16 @@ Hooks.once('setup', function () {
         requiresReload: true,
     });
 
+    game.settings.register(s_MODULE_ID, 'disableSelfPin', {
+        name: game.i18n.localize('PCM.settings.disableSelfPin.name'),
+        hint: game.i18n.localize('PCM.settings.disableSelfPin.hint'),
+        default: false,
+        type: Boolean,
+        scope: 'world',
+        config: true,
+        requiresReload: true,
+    });
+
     addMigrationSettings()
 
     listenSocket()
