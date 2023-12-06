@@ -121,8 +121,10 @@ Hooks.on('getChatLogEntryContext', (_chatLogApp, entries) => {
         name:  game.i18n.localize('PCM.allPin'),
         icon: '<i class="fas fa-map-pin"></i>',
         condition: (li) => {
-          const chatMessage = getmessage(li);
-          return checkIsPinned(chatMessage) !== ENUM_IS_PINNED_VALUE.all && allowToPinMessage(chatMessage);
+            if(!game.user.isGM && game.settings.get(s_MODULE_ID, 'disablePinForAll')) return false
+
+            const chatMessage = getmessage(li);
+            return checkIsPinned(chatMessage) !== ENUM_IS_PINNED_VALUE.all && allowToPinMessage(chatMessage);
         },
         callback: async (li) => {
           const chatMessage = getmessage(li);
@@ -133,6 +135,8 @@ Hooks.on('getChatLogEntryContext', (_chatLogApp, entries) => {
         name:  game.i18n.localize('PCM.selfPin'),
         icon: '<i class="fas fa-map-pin"></i>',
         condition: (li) => {
+            if(!game.user.isGM && game.settings.get(s_MODULE_ID, 'disableSelfPin')) return false
+
             const chatMessage = getmessage(li);
             return checkIsPinned(chatMessage) !== ENUM_IS_PINNED_VALUE.self && allowToPinMessage(chatMessage);
         },
@@ -146,7 +150,15 @@ Hooks.on('getChatLogEntryContext', (_chatLogApp, entries) => {
         icon: '<i class="fas fa-map-pin"></i>',
         condition: (li) => {
             const chatMessage = getmessage(li);
-            return checkIsPinned(chatMessage) !== ENUM_IS_PINNED_VALUE.none && allowToPinMessage(chatMessage);
+            const pinnedStatus = checkIsPinned(chatMessage)
+
+            const disablePin = !game.user.isGM
+                && (
+                    (pinnedStatus === ENUM_IS_PINNED_VALUE.all && game.settings.get(s_MODULE_ID, 'disablePinForAll'))
+                    || (pinnedStatus === ENUM_IS_PINNED_VALUE.self && game.settings.get(s_MODULE_ID, 'disableSelfPin'))
+                )
+
+            return !disablePin && pinnedStatus !== ENUM_IS_PINNED_VALUE.none && allowToPinMessage(chatMessage);
         },
         callback: async (li) => {
             const chatMessage = getmessage(li);
