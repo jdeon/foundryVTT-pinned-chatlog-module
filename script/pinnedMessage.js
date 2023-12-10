@@ -47,7 +47,7 @@ export function addPinnedButton(messageElement, chatMessage) {
     if (messageMetadata.length != 1) {
         return;
     }
-    let button = $(`<a id='btn-pinned-message-${chatMessage.id}'> <i class="fas"></i></a>`);//Example of circle fa-circle
+    let button = $(`<a id='btn-pinned-message-${chatMessage.id}'> <i class="fas"></i></a>`);
     button.on('click', () => pinnedButtonClick(chatMessage));
     button.on('dblclick', () => pinnedButtonDblClick(chatMessage, game.user));
     changeIcon(button, chatMessage.flags?.pinnedChat?.pinned);

@@ -93,8 +93,14 @@ Hooks.on("renderChatLog", async function (chatLog, html, user) {
 });
 
 Hooks.on("renderChatMessage", (chatMessage, html, data) => {
-    if(chatMessage.canUserModify(Users.instance.current,'update') 
-    || game.user.role >= game.settings.get(s_MODULE_ID, "minimalRoleToPinnedOther")){
+    const buttonDisable = !game.user.isGM
+        &&  game.settings.get(s_MODULE_ID, "disablePinForAll")
+        &&  game.settings.get(s_MODULE_ID, "disableSelfPin")
+
+    const allowMessageUpdate = chatMessage.canUserModify(Users.instance.current,'update') 
+        || game.user.role >= game.settings.get(s_MODULE_ID, "minimalRoleToPinnedOther")
+
+    if(!buttonDisable && allowMessageUpdate){
         addPinnedButton(html, chatMessage);
     }
 
