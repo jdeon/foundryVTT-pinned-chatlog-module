@@ -4,6 +4,7 @@ Module for Foundry VTT. It add another chatlog for pinned message to pinned some
 ![image](doc/Default-tab.png)
 
 If you double click on a message pin, it s gonna pin the message only for you. The self pinned icon get the color of the user.
+You can also pin through the righ click menu of the chat message.
 
 In the pinned tab you can use a use the check box to show only the self pinned message
 
@@ -11,11 +12,16 @@ In the pinned tab you can use a use the check box to show only the self pinned m
 
 ![image](doc/Pinned-tab-check.png)
 
-
 ## Settings
 
+### Allow player to update message
 By default, you can only pinned message that you owned if you're are not GM. But it can be change in the settings
+//TODO add disabling setting
 
+### Disable pinner for player
+There is two settings to disable "pin for all" or/and "self pin". 
+If one is disable, simple click and double click will do the same behaviour (the one not disable).
+If both is disable, the pin button doesn't appears anymore.
 
 ## API
 The expose 3 methods by api : game.modules.get('pinned-chat-message').api.methodXXX
