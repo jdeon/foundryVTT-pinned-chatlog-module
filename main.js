@@ -1,8 +1,8 @@
 import { pinnedApi } from "./script/api.js";
 import { addMigrationSettings, migrateModule } from "./script/migrationManager.js"
-import { pinnedMessageUpdate, addPinnedButton } from "./script/pinnedMessage.js";
+import { pinnedMessageUpdate, addPinnedButton, pinnedMessage } from "./script/pinnedMessage.js";
 import { initTab, getCurrentTab, getCurrentTabId, PINNED_TAB_NAME } from "./script/pinnedTab.js";
-import { s_MODULE_ID, s_EVENT_NAME, CLASS_PINNED_TAB_MESSAGE, CLASS_PINNED_MESSAGE, ENUM_IS_PINNED_VALUE, checkIsPinned } from "./script/utils.js"
+import { s_MODULE_ID, s_EVENT_NAME, CLASS_PINNED_TAB_MESSAGE, CLASS_PINNED_MESSAGE, ENUM_IS_PINNED_VALUE, PINNED_FOR_ALL, checkIsPinned, allowToPinMessage } from "./script/utils.js"
 
 let isChatTab = false;
 
@@ -28,6 +28,26 @@ Hooks.once('setup', function () {
             {}
         ),
         type: String,
+        scope: 'world',
+        config: true,
+        requiresReload: true,
+    });
+
+    game.settings.register(s_MODULE_ID, 'disablePinForAll', {
+        name: game.i18n.localize('PCM.settings.disablePinForAll.name'),
+        hint: game.i18n.localize('PCM.settings.disablePinForAll.hint'),
+        default: false,
+        type: Boolean,
+        scope: 'world',
+        config: true,
+        requiresReload: true,
+    });
+
+    game.settings.register(s_MODULE_ID, 'disableSelfPin', {
+        name: game.i18n.localize('PCM.settings.disableSelfPin.name'),
+        hint: game.i18n.localize('PCM.settings.disableSelfPin.hint'),
+        default: false,
+        type: Boolean,
         scope: 'world',
         config: true,
         requiresReload: true,
@@ -73,8 +93,14 @@ Hooks.on("renderChatLog", async function (chatLog, html, user) {
 });
 
 Hooks.on("renderChatMessage", (chatMessage, html, data) => {
-    if(chatMessage.canUserModify(Users.instance.current,'update') 
-    || game.user.role >= game.settings.get(s_MODULE_ID, "minimalRoleToPinnedOther")){
+    const buttonDisable = !game.user.isGM
+        &&  game.settings.get(s_MODULE_ID, "disablePinForAll")
+        &&  game.settings.get(s_MODULE_ID, "disableSelfPin")
+
+    const allowMessageUpdate = chatMessage.canUserModify(Users.instance.current,'update') 
+        || game.user.role >= game.settings.get(s_MODULE_ID, "minimalRoleToPinnedOther")
+
+    if(!buttonDisable && allowMessageUpdate){
         addPinnedButton(html, chatMessage);
     }
 
@@ -92,6 +118,65 @@ Hooks.on("renderChatMessage", (chatMessage, html, data) => {
         html.hide();
     }
 });
+
+Hooks.on('getChatLogEntryContext', (_chatLogApp, entries) => {
+    const getmessage = (li) => game.messages.get(li.data('messageId'))
+  
+    entries.unshift(
+      {
+        name:  game.i18n.localize('PCM.allPin'),
+        icon: '<i class="fas fa-map-pin"></i>',
+        condition: (li) => {
+            if(!game.user.isGM && game.settings.get(s_MODULE_ID, 'disablePinForAll')) return false
+
+            const chatMessage = getmessage(li);
+            return checkIsPinned(chatMessage) !== ENUM_IS_PINNED_VALUE.all && allowToPinMessage(chatMessage);
+        },
+        callback: async (li) => {
+          const chatMessage = getmessage(li);
+          pinnedMessage(chatMessage)
+        }
+      },
+      {
+        name:  game.i18n.localize('PCM.selfPin'),
+        icon: '<i class="fas fa-map-pin"></i>',
+        condition: (li) => {
+            if(!game.user.isGM && game.settings.get(s_MODULE_ID, 'disableSelfPin')) return false
+
+            const chatMessage = getmessage(li);
+            return checkIsPinned(chatMessage) !== ENUM_IS_PINNED_VALUE.self && allowToPinMessage(chatMessage);
+        },
+        callback: async (li) => {
+            const chatMessage = getmessage(li);
+            pinnedMessage(chatMessage, {target : game.user.id})
+        },
+      },
+      {
+        name: game.i18n.localize('PCM.unPin'),
+        icon: '<i class="fas fa-map-pin"></i>',
+        condition: (li) => {
+            const chatMessage = getmessage(li);
+            const pinnedStatus = checkIsPinned(chatMessage)
+
+            const disablePin = !game.user.isGM
+                && (
+                    (pinnedStatus === ENUM_IS_PINNED_VALUE.all && game.settings.get(s_MODULE_ID, 'disablePinForAll'))
+                    || (pinnedStatus === ENUM_IS_PINNED_VALUE.self && game.settings.get(s_MODULE_ID, 'disableSelfPin'))
+                )
+
+            return !disablePin && pinnedStatus !== ENUM_IS_PINNED_VALUE.none && allowToPinMessage(chatMessage);
+        },
+        callback: async (li) => {
+            const chatMessage = getmessage(li);
+            if(checkIsPinned(chatMessage) === ENUM_IS_PINNED_VALUE.self){
+                pinnedMessage(chatMessage, {target : game.user.id, active:false})
+            } else if (checkIsPinned(chatMessage) === ENUM_IS_PINNED_VALUE.all){
+                pinnedMessage(chatMessage, {target : PINNED_FOR_ALL, active:false})
+            }
+        },
+      }
+    );
+  });
   
   /**
   * Provides the main incoming message registration and distribution of socket messages on the receiving side.
