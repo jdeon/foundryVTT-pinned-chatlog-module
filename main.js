@@ -133,7 +133,13 @@ Hooks.on("deleteChatMessage", (chatMessage, option) => {
     if(option.deleteAll 
         && game.settings.get(s_MODULE_ID, "protectPinnedFromDeletion")
         && chatMessage.flags?.pinnedChat?.pinned?.length > 0){
-        ChatMessage.create(chatMessage)
+        
+            if(chatMessage.isAuthor){
+                ChatMessage.create(chatMessage)
+            } else {
+                //Bug double render unauthor message when create
+                chatMessage.render()
+            }
     }
 });
 
