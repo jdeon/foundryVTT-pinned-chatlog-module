@@ -4,6 +4,8 @@
     "PCM.TABS.SeflPinnedChekkbox":"Nur selbst angeheftet",
     "PCM.settings.minimalRole.name": "Minimale Nutzerrolle zum Pinnen von Nachrichten anderer",
     "PCM.settings.minimalRole.hint": "Minimale Nutzerrolle um die Chat-Nachrichten von anderen Nutzern zu pinnen",
+    "PCM.settings.protectPinnedFromDeletion.name": "Angeheftete Nachricht vor dem Löschen schützen",
+    "PCM.settings.protectPinnedFromDeletion.hint": "Die angeheftete Nachricht wird durch die Schaltfläche „Alle löschen“ nicht gelöscht",
     "PCM.settings.disablePinForAll.name": "Deaktivieren Sie die Standardeinstellung für den Spieler",
     "PCM.settings.disablePinForAll.hint": "Der Spieler kann nicht mehr für alle gepinnt werden",
     "PCM.settings.disableSelfPin.name": "Disable the self pinned for player",
