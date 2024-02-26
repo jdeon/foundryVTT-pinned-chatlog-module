@@ -33,6 +33,15 @@ Hooks.once('setup', function () {
         requiresReload: true,
     });
 
+    game.settings.register(s_MODULE_ID, 'protectPinnedFromDeletion', {
+        name: game.i18n.localize('PCM.settings.protectPinnedFromDeletion.name'),
+        hint: game.i18n.localize('PCM.settings.protectPinnedFromDeletion.hint'),
+        default: true,
+        type: Boolean,
+        scope: 'world',
+        config: true,
+    });
+
     game.settings.register(s_MODULE_ID, 'disablePinForAll', {
         name: game.i18n.localize('PCM.settings.disablePinForAll.name'),
         hint: game.i18n.localize('PCM.settings.disablePinForAll.hint'),
@@ -116,6 +125,16 @@ Hooks.on("renderChatMessage", (chatMessage, html, data) => {
 
     if (getCurrentTabId() === PINNED_TAB_NAME && !html.hasClass(CLASS_PINNED_MESSAGE)) {
         html.hide();
+    }
+});
+
+Hooks.on("deleteChatMessage", (chatMessage, option) => {
+    //Check pinned message on the flush chat button
+    if(game.user.isGM
+        && option.deleteAll 
+        && game.settings.get(s_MODULE_ID, "protectPinnedFromDeletion")
+        && chatMessage.flags?.pinnedChat?.pinned?.length > 0){
+            ChatMessage.create(chatMessage) 
     }
 });
 
