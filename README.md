@@ -18,7 +18,7 @@ In the pinned tab you can use a use the check box to show only the self pinned m
 By default, you can only pinned message that you owned if you're are not GM. But it can be change in the settings
 
 ### Protect pinned message from deletion
-Protect pinned message (by recreating them) when the chatlog is flushed
+Protect pinned message from GM deletion (useful when the chatlog is flushed) 
 
 ### Disable pinner for player
 There is two settings to disable "pin for all" or/and "self pin". 
