@@ -5,7 +5,7 @@
     "PCM.settings.minimalRole.name": "Rôle minimal pour épingler les autres messages",
     "PCM.settings.minimalRole.hint": "Rôle minimal pour épingler les messages des autres utilisateurs",
     "PCM.settings.protectPinnedFromDeletion.name": "Protéger messages épinglés de la suppression",
-    "PCM.settings.protectPinnedFromDeletion.hint": "Les messages épinglés ne seront préservés lors de la suppression de tous les messages",
+    "PCM.settings.protectPinnedFromDeletion.hint": "Les messages épinglés ne seront plus supprimable pour le MJ (Utils lors de la suppression de tous les messages)",
     "PCM.settings.disablePinForAll.name": "Désactiver l'épinglage générale pour les joueurs",
     "PCM.settings.disablePinForAll.hint": "Empèche les joueurs d'épingler un message pour tout le monde",
     "PCM.settings.disableSelfPin.name": "Désactiver l'épinglage personnel pour les joueurs",
