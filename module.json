@@ -3,10 +3,10 @@
 	"name": "pinned-chat-message",
 	"title": "Pinned chat message",
 	"description": "Pinned message to keep it in another chat (global).",
-	"version": "2.2.0",
+	"version": "2.2.1",
 	"compatibility": {
-		"minimum": "9",
-		"verified": "11.315"
+		"minimum": "12",
+		"verified": "12.328"
 	},
 	"authors": [
 		{
