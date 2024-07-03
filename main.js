@@ -128,13 +128,12 @@ Hooks.on("renderChatMessage", (chatMessage, html, data) => {
     }
 });
 
-Hooks.on("deleteChatMessage", (chatMessage, option) => {
+Hooks.on("preDeleteChatMessage", (chatMessage, option) => {
     //Check pinned message on the flush chat button
     if(game.user.isGM
-        && option.deleteAll 
         && game.settings.get(s_MODULE_ID, "protectPinnedFromDeletion")
         && chatMessage.flags?.pinnedChat?.pinned?.length > 0){
-            ChatMessage.create(chatMessage) 
+            return false 
     }
 });
 
