@@ -3,6 +3,7 @@
     margin: 0 0 5px;
     border-bottom: 1px solid #ff6400;
     box-shadow: 0 0 10px red;
+    pointer-events: all;
 }
 
 .pinnedchatlog .item.active {
