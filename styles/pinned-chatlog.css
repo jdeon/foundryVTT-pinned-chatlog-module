@@ -2,7 +2,7 @@
     flex: 0;
     width: var(--sidebar-width);
     margin: 0 0 5px;
-    box-shadow: 0 0 10px red;
+    background: var(--background-color, var(--color-cool-5));
     pointer-events: all;
 }
 
@@ -19,6 +19,7 @@
 }
 
 .pinnedchatlog .item {
+    line-height: normal;
     height: 18px;
     flex: 1;
 }
