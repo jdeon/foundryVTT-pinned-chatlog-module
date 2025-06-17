@@ -114,7 +114,7 @@ function clickSelfPinnedCheckbox(isCheck) {
     if (isCheck) {
         //Hide not self pinned message
         const pinnedMessagesToHide = game.messages.contents.filter(entry => checkIsPinned(entry) !== ENUM_IS_PINNED_VALUE.self);
-        const log = $(".chat-log");
+        const log = getChatLogs();
 
         for (let i = 0; i < pinnedMessagesToHide.length; i++) {
             let pinnedMessage = pinnedMessagesToHide[i];
@@ -125,6 +125,18 @@ function clickSelfPinnedCheckbox(isCheck) {
             }
         }
     }
+}
+
+function getChatLogs() {
+    const chatById = $("#chat-log");
+
+    if (chatById.length) return chatById
+
+    const chatByClass = $(".chat-log");
+
+    if (chatByClass.length) return chatByClass
+
+    throw new Error('Unfined chatlog')
 }
 
 
