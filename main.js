@@ -139,8 +139,12 @@ Hooks.on("preDeleteChatMessage", (chatMessage, option) => {
     }
 });
 
-Hooks.on('getChatLogEntryContext', (_chatLogApp, entries) => {
-    const getmessage = (li) => game.messages.get(li.data('messageId'))
+Hooks.on('getChatLogEntryContext', getChatMessageContextOptions); //v12 compatibility 
+
+Hooks.on('getChatMessageContextOptions', getChatMessageContextOptions);
+
+function getChatMessageContextOptions(_chatLogApp, entries) {
+    const getmessage = (li) => game.messages.get(li.dataset?.messageId ?? li.data('messageId')) //li.data('messageId') is for v12 compatibility
 
     entries.unshift(
         {
@@ -196,7 +200,7 @@ Hooks.on('getChatLogEntryContext', (_chatLogApp, entries) => {
             },
         }
     );
-});
+}
 
 /**
 * Provides the main incoming message registration and distribution of socket messages on the receiving side.
