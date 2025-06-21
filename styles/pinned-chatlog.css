@@ -1,8 +1,13 @@
-.pinnedchatlog.tabs {
+.pinnedchatlog {
     flex: 0;
+    width: var(--sidebar-width);
     margin: 0 0 5px;
+    background: var(--background-color, var(--color-cool-5));
+    pointer-events: all;
+}
+
+.pinnedchatlog .tabs {
     border-bottom: 1px solid #ff6400;
-    box-shadow: 0 0 10px red;
 }
 
 .pinnedchatlog .item.active {
@@ -14,6 +19,7 @@
 }
 
 .pinnedchatlog .item {
+    line-height: normal;
     height: 18px;
     flex: 1;
 }
