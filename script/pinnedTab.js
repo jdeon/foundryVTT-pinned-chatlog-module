@@ -52,7 +52,6 @@ export function getCurrentTabId() {
 
 function selectDefaultTab(chatLog) {
     currentTabId = DEFAULT_TAB_NAME;
-    checkboxSelfPinned.parentElement.style.display = 'none';
 
     setClassVisibility(CLASS_CHAT_MESSAGE, true);
 
@@ -80,16 +79,6 @@ async function selectPinnedTab(chatLog) {
         const htmlMessage = log.querySelector(
             `.message[data-message-id="${pinnedMessage.id}"]`
         );
-
-        // Hide non-self pinned message
-        if (
-            checkboxSelfPinned.checked &&
-            checkIsPinned(pinnedMessage) !== ENUM_IS_PINNED_VALUE.self
-        ) {
-            if( htmlMessage ) htmlMessage.style.display = "none";
-            
-            continue;
-        }
 
         if (htmlMessage) continue;//is already render
 
