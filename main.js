@@ -70,7 +70,7 @@ Hooks.once('setup', function () {
 Hooks.once('ready', function () {
     console.log(`${s_MODULE_ID} | ready to ${s_MODULE_ID}`);
 
-    getCurrentTab().addClass('active')
+    getCurrentTab().classList.add('active')
 
     migrateModule()
 
@@ -79,8 +79,6 @@ Hooks.once('ready', function () {
 
 //Add chatlog type navigation
 Hooks.on("renderChatLog", async function (chatLog, html, user) {
-    if (chatLog instanceof foundry.applications.api.ApplicationV2) html = $(chatLog.element);
-
     initTab(html, chatLog)
 
     //Check the activation of chat tab
@@ -92,23 +90,23 @@ Hooks.on("renderChatLog", async function (chatLog, html, user) {
             } else if (!isChatTab && currentClassState) {
                 //If we active the chat Tab we add the activation class on sub class
                 isChatTab = true
-                getCurrentTab().addClass('active');
+                getCurrentTab().classList.add('active');
             }
         });
     });
 
-    observer.observe(html[0], {
+    observer.observe(html, {
         attributes: true,
         attributeFilter: ['class']
     });
 });
 
-Hooks.on("renderChatMessage", (chatMessage, html, data) => {
+Hooks.on("renderChatMessageHTML", (chatMessage, html, data) => {
     const buttonDisable = !game.user.isGM
         && game.settings.get(s_MODULE_ID, "disablePinForAll")
         && game.settings.get(s_MODULE_ID, "disableSelfPin")
 
-    const allowMessageUpdate = chatMessage.canUserModify(Users.instance.current, 'update')
+    const allowMessageUpdate = chatMessage.canUserModify(foundry.documents.collections.Users.instance.current, 'update')
         || game.user.role >= game.settings.get(s_MODULE_ID, "minimalRoleToPinnedOther")
 
     if (!buttonDisable && allowMessageUpdate) {
@@ -116,17 +114,19 @@ Hooks.on("renderChatMessage", (chatMessage, html, data) => {
     }
 
     if (checkIsPinned(chatMessage) !== ENUM_IS_PINNED_VALUE.none) {
-        const htmlMessage = $("#chat-log").find(`.${CLASS_PINNED_TAB_MESSAGE}[data-message-id="${chatMessage.id}"]`)
-        if (htmlMessage.length) {
-            //Already generate message in pinned tab
-            htmlMessage.remove()
+        const htmlMessage = document
+            .querySelector(`.chat-log .${CLASS_PINNED_TAB_MESSAGE}[data-message-id="${chatMessage.id}"]`);
+
+        if (htmlMessage) {
+            // Already generated message in pinned tab
+            htmlMessage.remove();
         }
 
-        html.addClass(CLASS_PINNED_MESSAGE)
+        html.classList.add(CLASS_PINNED_MESSAGE);
     }
 
-    if (getCurrentTabId() === PINNED_TAB_NAME && !html.hasClass(CLASS_PINNED_MESSAGE)) {
-        html.hide();
+    if (getCurrentTabId() === PINNED_TAB_NAME && !html.classList.contains(CLASS_PINNED_MESSAGE)) {
+        html.style.display = "none";
     }
 });
 
@@ -139,13 +139,10 @@ Hooks.on("preDeleteChatMessage", (chatMessage, option) => {
     }
 });
 
-Hooks.on('getChatLogEntryContext', getChatMessageContextOptions); //v12 compatibility 
-
 Hooks.on('getChatMessageContextOptions', getChatMessageContextOptions);
 
 function getChatMessageContextOptions(_chatLogApp, entries) {
-    const getmessage = (li) => game.messages.get(li.dataset?.messageId ?? li.data('messageId')) //li.data('messageId') is for v12 compatibility
-
+    const getmessage = (li) => game.messages.get(li.dataset?.messageId)
     entries.unshift(
         {
             name: game.i18n.localize('PCM.allPin'),
