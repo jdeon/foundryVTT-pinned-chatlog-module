@@ -1,4 +1,4 @@
-import { CLASS_HARD_HIDE, CLASS_CHAT_MESSAGE, CLASS_PINNED_MESSAGE, CLASS_PINNED_TAB_MESSAGE, ENUM_IS_PINNED_VALUE, checkIsPinned } from './utils.js'
+import { CLASS_CHAT_MESSAGE, CLASS_PINNED_MESSAGE, CLASS_PINNED_TAB_MESSAGE, ENUM_IS_PINNED_VALUE, checkIsPinned } from './utils.js'
 
 export const DEFAULT_TAB_NAME = 'default';
 export const PINNED_TAB_NAME = 'pinned';
@@ -137,7 +137,6 @@ function setClassVisibility(cssClass, visible) {
 
     elements.forEach((element) => {
         if (visible) {
-            element.classList.remove(CLASS_HARD_HIDE);
             element.style.display = "";
         } else {
             element.style.display = "none";
