@@ -1,23 +1,11 @@
 .pinnedchatlog {
-    flex: 0;
     width: var(--sidebar-width);
-    margin: 0 0 5px;
-    background: var(--background-color, var(--color-cool-5));
     pointer-events: all;
 }
 
 .pinnedchatlog .tabs {
     display: flex;
     gap: 5px;
-    border-bottom: 1px solid #ff6400;
-}
-
-.pinnedchatlog .item.active {
-    color: #FFF;
-    border: 1px solid red;
-    border-bottom: none;
-    box-shadow: 0 0 6px inset #ff6400;
-    border-radius: 5px 5px 0 0;
 }
 
 .pinnedchatlog .item {
