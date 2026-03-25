@@ -163,13 +163,15 @@ function clickSelfPinnedCheckbox(isCheck) {
     }
 }
 
-function setClassVisibility(cssClass, visible) {//TODO 
-    const element = $('.' + cssClass)
+function setClassVisibility(cssClass, visible) {
+    const elements = document.querySelectorAll(`.${cssClass}`)
 
-    if (visible) {
-        element.removeClass(CLASS_HARD_HIDE);
-        element.show();
-    } else {
-        element.hide();
-    }
+    elements.forEach((element) => {
+        if (visible) {
+            element.classList.remove(CLASS_HARD_HIDE);
+            element.style.display = "";
+        } else {
+            element.style.display = "none";
+        }   
+    })
 };
