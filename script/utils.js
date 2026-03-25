@@ -30,7 +30,7 @@ export function checkIsPinned(chatMessage){
 }
 
 export function allowToPinMessage(chatMessage){
-    return chatMessage.canUserModify(Users.instance.current,'update')
+    return chatMessage.canUserModify(foundry.documents.collections.Users.instance.current,'update')
         || game.user.role >= game.settings.get(s_MODULE_ID, "minimalRoleToPinnedOther")
 }
 

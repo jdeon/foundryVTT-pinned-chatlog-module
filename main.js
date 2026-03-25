@@ -106,7 +106,7 @@ Hooks.on("renderChatMessageHTML", (chatMessage, html, data) => {
         && game.settings.get(s_MODULE_ID, "disablePinForAll")
         && game.settings.get(s_MODULE_ID, "disableSelfPin")
 
-    const allowMessageUpdate = chatMessage.canUserModify(Users.instance.current, 'update')
+    const allowMessageUpdate = chatMessage.canUserModify(foundry.documents.collections.Users.instance.current, 'update')
         || game.user.role >= game.settings.get(s_MODULE_ID, "minimalRoleToPinnedOther")
 
     if (!buttonDisable && allowMessageUpdate) {

@@ -1,7 +1,7 @@
 import { toggleArrayValue, simpleClick, doDoubleCheck, s_MODULE_ID, s_EVENT_NAME, PINNED_FOR_ALL } from './utils.js'
 
 export function pinnedMessage(chatMessage, pinnedFor){
-    if(chatMessage.canUserModify(Users.instance.current,'update')){
+    if(chatMessage.canUserModify(foundry.documents.collections.Users.instance.current,'update')){
         pinnedMessageUpdate(chatMessage, pinnedFor)
     } else if(game.user.role >= game.settings.get(s_MODULE_ID, "minimalRoleToPinnedOther")){
         pinnedUnownedMessage(chatMessage.id, pinnedFor)
