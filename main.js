@@ -70,7 +70,7 @@ Hooks.once('setup', function () {
 Hooks.once('ready', function () {
     console.log(`${s_MODULE_ID} | ready to ${s_MODULE_ID}`);
 
-    getCurrentTab().addClass('active')
+    getCurrentTab().classList.add('active')
 
     migrateModule()
 
@@ -79,8 +79,6 @@ Hooks.once('ready', function () {
 
 //Add chatlog type navigation
 Hooks.on("renderChatLog", async function (chatLog, html, user) {
-    if (chatLog instanceof foundry.applications.api.ApplicationV2) html = $(chatLog.element);
-
     initTab(html, chatLog)
 
     //Check the activation of chat tab
@@ -92,12 +90,12 @@ Hooks.on("renderChatLog", async function (chatLog, html, user) {
             } else if (!isChatTab && currentClassState) {
                 //If we active the chat Tab we add the activation class on sub class
                 isChatTab = true
-                getCurrentTab().addClass('active');
+                getCurrentTab().classList.add('active');
             }
         });
     });
 
-    observer.observe(html[0], {
+    observer.observe(html, {
         attributes: true,
         attributeFilter: ['class']
     });
