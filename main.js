@@ -137,13 +137,10 @@ Hooks.on("preDeleteChatMessage", (chatMessage, option) => {
     }
 });
 
-Hooks.on('getChatLogEntryContext', getChatMessageContextOptions); //v12 compatibility 
-
 Hooks.on('getChatMessageContextOptions', getChatMessageContextOptions);
 
 function getChatMessageContextOptions(_chatLogApp, entries) {
-    const getmessage = (li) => game.messages.get(li.dataset?.messageId ?? li.data('messageId')) //li.data('messageId') is for v12 compatibility
-
+    const getmessage = (li) => game.messages.get(li.dataset?.messageId)
     entries.unshift(
         {
             name: game.i18n.localize('PCM.allPin'),
