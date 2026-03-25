@@ -41,16 +41,25 @@ export function pinnedMessageUpdate(chatMessage, pinnedFor){
     }
 };
 
-export function addPinnedButton(messageElement, chatMessage) {
-    let messageMetadata = messageElement.find(".message-metadata")
+export function addPinnedButton(messageHtmlElement, chatMessage) {
+    const messageMetadata = messageHtmlElement.querySelector(".message-metadata");
+
     // Can't find it?
-    if (messageMetadata.length != 1) {
-        return;
-    }
-    let button = $(`<a id='btn-pinned-message-${chatMessage.id}'> <i class="fas"></i></a>`);
-    button.on('click', () => pinnedButtonClick(chatMessage));
-    button.on('dblclick', () => pinnedButtonDblClick(chatMessage, game.user));
+    if (!messageMetadata) return;
+
+    const button = document.createElement("a");
+    button.id = `btn-pinned-message-${chatMessage.id}`;
+
+    const icon = document.createElement("i");
+    icon.className = "fas";
+
+    button.append(icon);
+
+    button.addEventListener("click", () => pinnedButtonClick(chatMessage));
+    button.addEventListener("dblclick", () => pinnedButtonDblClick(chatMessage, game.user));
+
     changeIcon(button, chatMessage.flags?.pinnedChat?.pinned);
+
     messageMetadata.append(button);
 };
 
@@ -77,21 +86,26 @@ function selfPinnedMessage(chatMessage, user){
     pinnedMessage(chatMessage, {target : user.id})
 }
 
-function changeIcon(button, pinnedFor){
-    let icon = button.find(".fas");
+function changeIcon(buttonHtmlElement, pinnedFor) {
+    const icon = buttonHtmlElement.querySelector(".fas");
+    if (!icon) return;
 
-    if(pinnedFor?.includes(game.user.id)){
-        icon.removeClass('fa-map-pin');
-        icon.addClass('fa-circle');
-        icon.css("color", game.user.color)
-    } else if(pinnedFor?.includes(PINNED_FOR_ALL)){
-        icon.removeClass('fa-map-pin');
-        icon.addClass('fa-circle');
+    if (pinnedFor?.includes(game.user.id)) {
+        icon.classList.remove("fa-map-pin");
+        icon.classList.add("fa-circle");
+        icon.style.color = game.user.color;
+
+    } else if (pinnedFor?.includes(PINNED_FOR_ALL)) {
+        icon.classList.remove("fa-map-pin");
+        icon.classList.add("fa-circle");
+        icon.style.color = "";
+
     } else {
-        icon.addClass('fa-map-pin');
-        icon.removeClass('fa-circle');
+        icon.classList.add("fa-map-pin");
+        icon.classList.remove("fa-circle");
+        icon.style.color = "";
     }
-};
+}
 
 /***********************************
  * SOKET SETTING

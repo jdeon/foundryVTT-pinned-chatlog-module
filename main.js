@@ -101,7 +101,7 @@ Hooks.on("renderChatLog", async function (chatLog, html, user) {
     });
 });
 
-Hooks.on("renderChatMessage", (chatMessage, html, data) => {
+Hooks.on("renderChatMessageHTML", (chatMessage, html, data) => {
     const buttonDisable = !game.user.isGM
         && game.settings.get(s_MODULE_ID, "disablePinForAll")
         && game.settings.get(s_MODULE_ID, "disableSelfPin")
@@ -114,17 +114,19 @@ Hooks.on("renderChatMessage", (chatMessage, html, data) => {
     }
 
     if (checkIsPinned(chatMessage) !== ENUM_IS_PINNED_VALUE.none) {
-        const htmlMessage = $("#chat-log").find(`.${CLASS_PINNED_TAB_MESSAGE}[data-message-id="${chatMessage.id}"]`)
-        if (htmlMessage.length) {
-            //Already generate message in pinned tab
-            htmlMessage.remove()
+        const htmlMessage = document
+            .querySelector(`#chat-log .${CLASS_PINNED_TAB_MESSAGE}[data-message-id="${chatMessage.id}"]`);
+
+        if (htmlMessage) {
+            // Already generated message in pinned tab
+            htmlMessage.remove();
         }
 
-        html.addClass(CLASS_PINNED_MESSAGE)
+        html.classList.add(CLASS_PINNED_MESSAGE);
     }
 
     if (getCurrentTabId() === PINNED_TAB_NAME && !html.hasClass(CLASS_PINNED_MESSAGE)) {
-        html.hide();
+        html.hidden = true;
     }
 });
 
