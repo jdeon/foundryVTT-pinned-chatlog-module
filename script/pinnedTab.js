@@ -112,11 +112,11 @@ async function selectPinnedTab(chatLog) {
 
         // Hide non-self pinned message
         if (
-            htmlMessage &&
             checkboxSelfPinned.checked &&
             checkIsPinned(pinnedMessage) !== ENUM_IS_PINNED_VALUE.self
         ) {
-            htmlMessage.hidden = true;
+            if( htmlMessage ) htmlMessage.style.display = "none";
+            
             continue;
         }
 
@@ -152,33 +152,18 @@ function clickSelfPinnedCheckbox(isCheck) {
     if (isCheck) {
         //Hide not self pinned message
         const pinnedMessagesToHide = game.messages.contents.filter(entry => checkIsPinned(entry) !== ENUM_IS_PINNED_VALUE.self);
-        const log = getChatLogs();
+        const chatLogs = document.querySelectorAll(".chat-log");
 
         for (let i = 0; i < pinnedMessagesToHide.length; i++) {
             let pinnedMessage = pinnedMessagesToHide[i];
 
-            const htmlMessage = log.find(`.message[data-message-id="${pinnedMessage.id}"]`)
-            if (htmlMessage.length) {
-                htmlMessage.hide()
-            }
+            const htmlMessages = chatLogs.values().flatMap((log) => log.querySelectorAll(`.message[data-message-id="${pinnedMessage._id}"]`))
+            htmlMessages.forEach((htmlElement) => htmlElement.style.display = "none")
         }
     }
 }
 
-function getChatLogs() {
-    const chatById = $("#chat-log");
-
-    if (chatById.length) return chatById
-
-    const chatByClass = $(".chat-log");
-
-    if (chatByClass.length) return chatByClass
-
-    throw new Error('Unfined chatlog')
-}
-
-
-function setClassVisibility(cssClass, visible) {
+function setClassVisibility(cssClass, visible) {//TODO 
     const element = $('.' + cssClass)
 
     if (visible) {
