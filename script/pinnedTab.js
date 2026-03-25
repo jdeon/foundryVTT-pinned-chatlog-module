@@ -82,7 +82,7 @@ function selectDefaultTab(chatLog) {
 
     setClassVisibility(CLASS_CHAT_MESSAGE, true);
 
-    $('.' + CLASS_PINNED_TAB_MESSAGE).remove();
+    document.querySelectorAll(`.${CLASS_PINNED_TAB_MESSAGE}`).forEach(element => element.remove());
 
     chatLog.scrollBottom(true)
 };
@@ -98,39 +98,50 @@ async function selectPinnedTab(chatLog) {
 
     let pinnedMessages = game.messages.contents.filter(entry => checkIsPinned(entry) !== ENUM_IS_PINNED_VALUE.none);
 
-    const log = $("#chat-log");
-    let htmlMessages = [];
+    const log = document.querySelector("#chat-log");
+    if (!log) return;
 
-    for (let i = 0; i < pinnedMessages.length; i++) {
-        let pinnedMessage = pinnedMessages[i];
+    const htmlMessages = [];
+
+    for (const pinnedMessage of pinnedMessages) {
         if (!pinnedMessage.visible) continue;//isWisper or other hide message
 
-        const htmlMessage = log.find(`.message[data-message-id="${pinnedMessage.id}"]`)
+        const htmlMessage = log.querySelector(
+            `.message[data-message-id="${pinnedMessage.id}"]`
+        );
 
-        //Hide not self pinned message
-        if (checkboxSelfPinned.checked && checkIsPinned(pinnedMessage) !== ENUM_IS_PINNED_VALUE.self) {
-            if (htmlMessage.length) {
-                htmlMessage.hide()
-            }
-
+        // Hide non-self pinned message
+        if (
+            htmlMessage &&
+            checkboxSelfPinned.checked &&
+            checkIsPinned(pinnedMessage) !== ENUM_IS_PINNED_VALUE.self
+        ) {
+            htmlMessage.hidden = true;
             continue;
         }
 
-        if (htmlMessage.length) continue;//is already render
+        if (htmlMessage) continue;//is already render
 
         pinnedMessage.logged = true;
+
         try {
-            let messageHtml = await pinnedMessage.getHTML();
-            messageHtml.addClass(CLASS_PINNED_TAB_MESSAGE)
+            const messageHtml = await pinnedMessage.renderHTML();
+
+            // Foundry v12 returns HTMLElement
+            messageHtml.classList.add(CLASS_PINNED_TAB_MESSAGE);
+
             htmlMessages.push(messageHtml);
+
         } catch (err) {
-            err.message = `Pinned message ${pinnedMessage.id} failed to render: ${err})`;
+            err.message = `Pinned message ${pinnedMessage.id} failed to render: ${err}`;
             console.error(err);
         }
     }
 
-    // Prepend the HTML
-    log.prepend(htmlMessages);
+    // Prepend rendered messages
+    if (htmlMessages.length) {
+        log.prepend(...htmlMessages);
+    }
 
     chatLog.scrollBottom(true)
 };
