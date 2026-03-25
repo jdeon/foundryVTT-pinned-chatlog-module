@@ -4,7 +4,7 @@ export const DEFAULT_TAB_NAME = 'default';
 export const PINNED_TAB_NAME = 'pinned';
 
 let currentTabId = DEFAULT_TAB_NAME;
-let buttonDefault, buttonPinned, checkboxSelfPinned
+let buttonDefault, buttonPinned, buttonSelfPinned
 /**
  * Add chat subtabs
  * @param {*} html 
@@ -12,51 +12,35 @@ let buttonDefault, buttonPinned, checkboxSelfPinned
  */
 export function initTab(html, chatLog) {
     // Bouton Default
-    buttonDefault = document.createElement('a');
+    buttonDefault = document.createElement('button');
     buttonDefault.className = 'item default';
     buttonDefault.dataset.tab = 'default';
     buttonDefault.textContent = game.i18n.localize("PCM.TABS.Default");
     buttonDefault.addEventListener('click', () => selectDefaultTab(chatLog));
 
     // Bouton Pinned
-    buttonPinned = document.createElement('a');
+    buttonPinned = document.createElement('button');
     buttonPinned.className = 'item pinned';
     buttonPinned.dataset.tab = 'pinned';
     buttonPinned.textContent = game.i18n.localize("PCM.TABS.Pinned");
     buttonPinned.addEventListener('click', () => selectPinnedTab(chatLog));
 
-    // Div checkbox
-    const divSelfPinned = document.createElement('div');
-    divSelfPinned.style.flex = 'none';
-    divSelfPinned.style.display = 'none';
-
     // Checkbox
-    checkboxSelfPinned = document.createElement('input');
-    checkboxSelfPinned.type = 'checkbox';
-    checkboxSelfPinned.id = 'selfPinned';
-    checkboxSelfPinned.name = 'selfPinned';
-    checkboxSelfPinned.addEventListener('change', ({ target }) => {
-        clickSelfPinnedCheckbox(target?.checked);
-    });
+    buttonSelfPinned = document.createElement('button');;
+    buttonSelfPinned.className = 'item selfPinned';
+    buttonSelfPinned.dataset.tab = 'selfPinned';
+    buttonSelfPinned.textContent = game.i18n.localize("PCM.TABS.SeflPinnedChekkbox");
+    buttonSelfPinned.addEventListener('click', () => clickSelfPinnedCheckbox());
 
-    // Label
-    const label = document.createElement('label');
-    label.setAttribute('for', 'selfPinned');
-    label.style.display = 'flex';
-    label.style.alignItems = 'center';
-    label.textContent = game.i18n.localize("PCM.TABS.SeflPinnedChekkbox");
-
-    divSelfPinned.append(checkboxSelfPinned, label);
-
-    // Nav container
-    const buttonContainer = document.createElement('nav');
+    // buttons container
+    const buttonContainer = document.createElement('div');
     buttonContainer.className = 'tabs chat-pinned';
-    buttonContainer.append(buttonDefault, buttonPinned);
+    buttonContainer.append(buttonDefault, buttonPinned, buttonSelfPinned);
 
     // Module container
     const moduleContainer = document.createElement('div');
     moduleContainer.className = 'pinnedchatlog';
-    moduleContainer.append(buttonContainer, divSelfPinned);
+    moduleContainer.append(buttonContainer);
 
     // Insertion au début
     html.prepend(moduleContainer);
@@ -66,18 +50,8 @@ export function getCurrentTabId() {
     return currentTabId
 }
 
-export function getCurrentTab() {
-    if (currentTabId === PINNED_TAB_NAME) {
-        return buttonPinned
-    } else {
-        return buttonDefault
-    }
-}
-
 function selectDefaultTab(chatLog) {
     currentTabId = DEFAULT_TAB_NAME;
-    buttonDefault.classList.add('active');
-    buttonPinned.classList.remove('active');
     checkboxSelfPinned.parentElement.style.display = 'none';
 
     setClassVisibility(CLASS_CHAT_MESSAGE, true);
@@ -89,9 +63,6 @@ function selectDefaultTab(chatLog) {
 
 async function selectPinnedTab(chatLog) {
     currentTabId = PINNED_TAB_NAME;
-    buttonPinned.classList.add('active');
-    buttonDefault.classList.remove('active');
-    checkboxSelfPinned.parentElement.style.display = 'flex';
 
     setClassVisibility(CLASS_CHAT_MESSAGE, false);
     setClassVisibility(CLASS_PINNED_MESSAGE, true);
@@ -146,20 +117,18 @@ async function selectPinnedTab(chatLog) {
     chatLog.scrollBottom(true)
 };
 
-function clickSelfPinnedCheckbox(isCheck) {
+function clickSelfPinnedCheckbox() {
     setClassVisibility(CLASS_PINNED_MESSAGE, true);
 
-    if (isCheck) {
-        //Hide not self pinned message
-        const pinnedMessagesToHide = game.messages.contents.filter(entry => checkIsPinned(entry) !== ENUM_IS_PINNED_VALUE.self);
-        const chatLogs = document.querySelectorAll(".chat-log");
+    //Hide not self pinned message
+    const pinnedMessagesToHide = game.messages.contents.filter(entry => checkIsPinned(entry) !== ENUM_IS_PINNED_VALUE.self);
+    const chatLogs = document.querySelectorAll(".chat-log");
 
-        for (let i = 0; i < pinnedMessagesToHide.length; i++) {
-            let pinnedMessage = pinnedMessagesToHide[i];
+    for (let i = 0; i < pinnedMessagesToHide.length; i++) {
+        let pinnedMessage = pinnedMessagesToHide[i];
 
-            const htmlMessages = chatLogs.values().flatMap((log) => log.querySelectorAll(`.message[data-message-id="${pinnedMessage._id}"]`))
-            htmlMessages.forEach((htmlElement) => htmlElement.style.display = "none")
-        }
+        const htmlMessages = chatLogs.values().flatMap((log) => log.querySelectorAll(`.message[data-message-id="${pinnedMessage._id}"]`))
+        htmlMessages.forEach((htmlElement) => htmlElement.style.display = "none")
     }
 }
 
