@@ -98,7 +98,7 @@ async function selectPinnedTab(chatLog) {
 
     let pinnedMessages = game.messages.contents.filter(entry => checkIsPinned(entry) !== ENUM_IS_PINNED_VALUE.none);
 
-    const log = document.querySelector("#chat-log");
+    const log = document.querySelector(".chat-log");
     if (!log) return;
 
     const htmlMessages = [];

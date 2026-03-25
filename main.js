@@ -115,7 +115,7 @@ Hooks.on("renderChatMessageHTML", (chatMessage, html, data) => {
 
     if (checkIsPinned(chatMessage) !== ENUM_IS_PINNED_VALUE.none) {
         const htmlMessage = document
-            .querySelector(`#chat-log .${CLASS_PINNED_TAB_MESSAGE}[data-message-id="${chatMessage.id}"]`);
+            .querySelector(`.chat-log .${CLASS_PINNED_TAB_MESSAGE}[data-message-id="${chatMessage.id}"]`);
 
         if (htmlMessage) {
             // Already generated message in pinned tab
@@ -125,8 +125,8 @@ Hooks.on("renderChatMessageHTML", (chatMessage, html, data) => {
         html.classList.add(CLASS_PINNED_MESSAGE);
     }
 
-    if (getCurrentTabId() === PINNED_TAB_NAME && !html.hasClass(CLASS_PINNED_MESSAGE)) {
-        html.hidden = true;
+    if (getCurrentTabId() === PINNED_TAB_NAME && !html.classList.contains(CLASS_PINNED_MESSAGE)) {
+        html.style.display = "none";
     }
 });
 
