@@ -9,7 +9,9 @@
 }
 
 .pinnedchatlog .item {
-    line-height: normal;
-    height: 18px;
     flex: 1;
+}
+
+.pinnedchatlog:hover .item {
+    background:black;
 }
