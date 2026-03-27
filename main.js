@@ -1,7 +1,7 @@
 import { pinnedApi } from "./script/api.js";
 import { addMigrationSettings, migrateModule } from "./script/migrationManager.js"
 import { pinnedMessageUpdate, addPinnedButton, pinnedMessage } from "./script/pinnedMessage.js";
-import { initTab, getCurrentTab, getCurrentTabId, PINNED_TAB_NAME } from "./script/pinnedTab.js";
+import { initTab, getCurrentTabId, PINNED_TAB_NAME } from "./script/pinnedTab.js";
 import { s_MODULE_ID, s_EVENT_NAME, CLASS_PINNED_TAB_MESSAGE, CLASS_PINNED_MESSAGE, ENUM_IS_PINNED_VALUE, PINNED_FOR_ALL, checkIsPinned, allowToPinMessage } from "./script/utils.js"
 
 let isChatTab = false;
@@ -70,8 +70,6 @@ Hooks.once('setup', function () {
 Hooks.once('ready', function () {
     console.log(`${s_MODULE_ID} | ready to ${s_MODULE_ID}`);
 
-    getCurrentTab().classList.add('active')
-
     migrateModule()
 
     game.modules.get(s_MODULE_ID).api = pinnedApi
@@ -89,8 +87,7 @@ Hooks.on("renderChatLog", async function (chatLog, html, user) {
                 isChatTab = false
             } else if (!isChatTab && currentClassState) {
                 //If we active the chat Tab we add the activation class on sub class
-                isChatTab = true
-                getCurrentTab().classList.add('active');
+                isChatTab = true;
             }
         });
     });
