@@ -13,28 +13,35 @@ let buttonDefault, buttonPinned, buttonSelfPinned
 export function initTab(html, chatLog) {
     // Bouton Default
     buttonDefault = document.createElement('button');
-    buttonDefault.className = 'item default';
+    buttonDefault.className = 'ui-control item default';
     buttonDefault.dataset.tab = 'default';
+    buttonDefault.setAttribute("aria-pressed", "true")
+    buttonDefault.setAttribute("role", "tab")
     buttonDefault.textContent = game.i18n.localize("PCM.TABS.Default");
     buttonDefault.addEventListener('click', () => selectDefaultTab(chatLog));
 
     // Bouton Pinned
     buttonPinned = document.createElement('button');
-    buttonPinned.className = 'item pinned';
+    buttonPinned.className = 'ui-control item pinned';
     buttonPinned.dataset.tab = 'pinned';
+    buttonPinned.setAttribute("aria-pressed", "false")
+    buttonPinned.setAttribute("role", "tab")
     buttonPinned.textContent = game.i18n.localize("PCM.TABS.Pinned");
     buttonPinned.addEventListener('click', () => selectPinnedTab(chatLog));
 
     // Checkbox
     buttonSelfPinned = document.createElement('button');;
-    buttonSelfPinned.className = 'item selfPinned';
+    buttonSelfPinned.className = 'ui-control item selfPinned';
+    buttonSelfPinned.setAttribute("aria-pressed", "false")
+    buttonSelfPinned.setAttribute("role", "tab")
     buttonSelfPinned.dataset.tab = 'selfPinned';
     buttonSelfPinned.textContent = game.i18n.localize("PCM.TABS.SeflPinnedChekkbox");
     buttonSelfPinned.addEventListener('click', () => clickSelfPinnedCheckbox());
 
     // buttons container
     const buttonContainer = document.createElement('div');
-    buttonContainer.className = 'tabs chat-pinned';
+    buttonContainer.className = 'tabs faded-ui chat-pinned';
+    buttonContainer.role="tablist"
     buttonContainer.append(buttonDefault, buttonPinned, buttonSelfPinned);
 
     // Module container
@@ -52,6 +59,7 @@ export function getCurrentTabId() {
 
 function selectDefaultTab(chatLog) {
     currentTabId = DEFAULT_TAB_NAME;
+    highlightButton(buttonDefault)
 
     setClassVisibility(CLASS_CHAT_MESSAGE, true);
 
@@ -62,6 +70,7 @@ function selectDefaultTab(chatLog) {
 
 async function selectPinnedTab(chatLog) {
     currentTabId = PINNED_TAB_NAME;
+    highlightButton(buttonPinned)
 
     setClassVisibility(CLASS_CHAT_MESSAGE, false);
     setClassVisibility(CLASS_PINNED_MESSAGE, true);
@@ -107,6 +116,8 @@ async function selectPinnedTab(chatLog) {
 };
 
 function clickSelfPinnedCheckbox() {
+    highlightButton(buttonSelfPinned);
+
     setClassVisibility(CLASS_PINNED_MESSAGE, true);
 
     //Hide not self pinned message
@@ -131,4 +142,12 @@ function setClassVisibility(cssClass, visible) {
             element.style.display = "none";
         }   
     })
+};
+
+function highlightButton(button) {
+    buttonDefault.setAttribute("aria-pressed", "false")
+    buttonPinned.setAttribute("aria-pressed", "false")
+    buttonSelfPinned.setAttribute("aria-pressed", "false")
+
+    button.setAttribute("aria-pressed", "true")
 };

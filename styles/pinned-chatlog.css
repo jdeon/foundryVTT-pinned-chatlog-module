@@ -11,7 +11,3 @@
 .pinnedchatlog .item {
     flex: 1;
 }
-
-.pinnedchatlog:hover .item {
-    background:black;
-}
