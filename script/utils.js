@@ -3,7 +3,6 @@ export const s_EVENT_NAME = `module.${s_MODULE_ID}`;
 export const PINNED_FOR_ALL = 'all'
 
 //CSS
-export const CLASS_HARD_HIDE = 'hardHide'
 export const CLASS_CHAT_MESSAGE = 'chat-message'
 export const CLASS_PINNED_MESSAGE = 'pinned-message'
 export const CLASS_PINNED_TAB_MESSAGE = 'pinned-tab-message'
@@ -30,7 +29,7 @@ export function checkIsPinned(chatMessage){
 }
 
 export function allowToPinMessage(chatMessage){
-    return chatMessage.canUserModify(Users.instance.current,'update')
+    return chatMessage.canUserModify(foundry.documents.collections.Users.instance.current,'update')
         || game.user.role >= game.settings.get(s_MODULE_ID, "minimalRoleToPinnedOther")
 }
 

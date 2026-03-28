@@ -1,37 +1,55 @@
-import { CLASS_HARD_HIDE, CLASS_CHAT_MESSAGE, CLASS_PINNED_MESSAGE, CLASS_PINNED_TAB_MESSAGE, ENUM_IS_PINNED_VALUE, checkIsPinned } from './utils.js'
+import { CLASS_CHAT_MESSAGE, CLASS_PINNED_MESSAGE, CLASS_PINNED_TAB_MESSAGE, ENUM_IS_PINNED_VALUE, checkIsPinned } from './utils.js'
 
 export const DEFAULT_TAB_NAME = 'default';
 export const PINNED_TAB_NAME = 'pinned';
 
 let currentTabId = DEFAULT_TAB_NAME;
-let buttonDefault
-let buttonPinned
-let checkboxSelfPinned
-
+let buttonDefault, buttonPinned, buttonSelfPinned
 /**
  * Add chat subtabs
  * @param {*} html 
  * @param {*} chatLog 
  */
 export function initTab(html, chatLog) {
-    buttonDefault = $(`<a class="item default" data-tab="default">${game.i18n.localize("PCM.TABS.Default")}</a>`);
-    buttonDefault.on('click', (event) => selectDefaultTab(chatLog));
+    // Bouton Default
+    buttonDefault = document.createElement('button');
+    buttonDefault.className = 'ui-control item default';
+    buttonDefault.dataset.tab = 'default';
+    buttonDefault.setAttribute("aria-pressed", "true")
+    buttonDefault.setAttribute("role", "tab")
+    buttonDefault.textContent = game.i18n.localize("PCM.TABS.Default");
+    buttonDefault.addEventListener('click', () => selectDefaultTab(chatLog));
 
-    buttonPinned = $(`<a class="item pinned" data-tab="pinned">${game.i18n.localize("PCM.TABS.Pinned")}</a>`);
-    buttonPinned.on('click', (event) => selectPinnedTab(chatLog));
+    // Bouton Pinned
+    buttonPinned = document.createElement('button');
+    buttonPinned.className = 'ui-control item pinned';
+    buttonPinned.dataset.tab = 'pinned';
+    buttonPinned.setAttribute("aria-pressed", "false")
+    buttonPinned.setAttribute("role", "tab")
+    buttonPinned.textContent = game.i18n.localize("PCM.TABS.Pinned");
+    buttonPinned.addEventListener('click', () => selectPinnedTab(chatLog));
 
-    let divSelfPinned = $(`<div style="flex: none;display: none;"></div>`);
+    // Checkbox
+    buttonSelfPinned = document.createElement('button');;
+    buttonSelfPinned.className = 'ui-control item selfPinned';
+    buttonSelfPinned.setAttribute("aria-pressed", "false")
+    buttonSelfPinned.setAttribute("role", "tab")
+    buttonSelfPinned.dataset.tab = 'selfPinned';
+    buttonSelfPinned.textContent = game.i18n.localize("PCM.TABS.SeflPinnedChekkbox");
+    buttonSelfPinned.addEventListener('click', () => clickSelfPinnedCheckbox());
 
-    checkboxSelfPinned = $(`<input type="checkbox" id="selfPinned" name="selfPinned">`);
-    checkboxSelfPinned.on('change', ({ target }) => clickSelfPinnedCheckbox(target?.checked));
+    // buttons container
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'tabs faded-ui chat-pinned';
+    buttonContainer.role="tablist"
+    buttonContainer.append(buttonDefault, buttonPinned, buttonSelfPinned);
 
-    divSelfPinned.append(checkboxSelfPinned).append(`<label for="selfPinned" style="display: flex;align-items: center;">${game.i18n.localize("PCM.TABS.SeflPinnedChekkbox")}</label>`);
+    // Module container
+    const moduleContainer = document.createElement('div');
+    moduleContainer.className = 'pinnedchatlog';
+    moduleContainer.append(buttonContainer);
 
-    let buttonContainer = $('<nav class="tabs chat-pinned"></nav>');
-    buttonContainer.append(buttonDefault).append(buttonPinned);
-
-    let moduleContainer = $('<div class="pinnedchatlog "></div>')
-    moduleContainer.append(buttonContainer).append(divSelfPinned);
+    // Insertion au début
     html.prepend(moduleContainer);
 }
 
@@ -39,114 +57,97 @@ export function getCurrentTabId() {
     return currentTabId
 }
 
-export function getCurrentTab() {
-    if (currentTabId === PINNED_TAB_NAME) {
-        return buttonPinned
-    } else {
-        return buttonDefault
-    }
-}
-
 function selectDefaultTab(chatLog) {
     currentTabId = DEFAULT_TAB_NAME;
-    buttonDefault.addClass('active');
-    buttonPinned.removeClass('active');
-    checkboxSelfPinned.parent().css("display", "none")
+    highlightButton(buttonDefault)
 
     setClassVisibility(CLASS_CHAT_MESSAGE, true);
 
-    $('.' + CLASS_PINNED_TAB_MESSAGE).remove();
+    document.querySelectorAll(`.${CLASS_PINNED_TAB_MESSAGE}`).forEach(element => element.remove());
 
     chatLog.scrollBottom(true)
 };
 
 async function selectPinnedTab(chatLog) {
     currentTabId = PINNED_TAB_NAME;
-    buttonPinned.addClass('active');
-    buttonDefault.removeClass('active');
-    checkboxSelfPinned.parent().css("display", "flex")
+    highlightButton(buttonPinned)
 
     setClassVisibility(CLASS_CHAT_MESSAGE, false);
     setClassVisibility(CLASS_PINNED_MESSAGE, true);
 
     let pinnedMessages = game.messages.contents.filter(entry => checkIsPinned(entry) !== ENUM_IS_PINNED_VALUE.none);
 
-    const log = $("#chat-log");
-    let htmlMessages = [];
+    const log = document.querySelector(".chat-log");
+    if (!log) return;
 
-    for (let i = 0; i < pinnedMessages.length; i++) {
-        let pinnedMessage = pinnedMessages[i];
+    const htmlMessages = [];
+
+    for (const pinnedMessage of pinnedMessages) {
         if (!pinnedMessage.visible) continue;//isWisper or other hide message
 
-        const htmlMessage = log.find(`.message[data-message-id="${pinnedMessage.id}"]`)
+        const htmlMessage = log.querySelector(
+            `.message[data-message-id="${pinnedMessage.id}"]`
+        );
 
-        //Hide not self pinned message
-        if (checkboxSelfPinned.is(":checked") && checkIsPinned(pinnedMessage) !== ENUM_IS_PINNED_VALUE.self) {
-            if (htmlMessage.length) {
-                htmlMessage.hide()
-            }
-
-            continue;
-        }
-
-        if (htmlMessage.length) continue;//is already render
+        if (htmlMessage) continue;//is already render
 
         pinnedMessage.logged = true;
+
         try {
-            let messageHtml = await pinnedMessage.getHTML();
-            messageHtml.addClass(CLASS_PINNED_TAB_MESSAGE)
+            const messageHtml = await pinnedMessage.renderHTML();
+
+            // Foundry v12 returns HTMLElement
+            messageHtml.classList.add(CLASS_PINNED_TAB_MESSAGE);
+
             htmlMessages.push(messageHtml);
+
         } catch (err) {
-            err.message = `Pinned message ${pinnedMessage.id} failed to render: ${err})`;
+            err.message = `Pinned message ${pinnedMessage.id} failed to render: ${err}`;
             console.error(err);
         }
     }
 
-    // Prepend the HTML
-    log.prepend(htmlMessages);
+    // Prepend rendered messages
+    if (htmlMessages.length) {
+        log.prepend(...htmlMessages);
+    }
 
     chatLog.scrollBottom(true)
 };
 
-function clickSelfPinnedCheckbox(isCheck) {
+function clickSelfPinnedCheckbox() {
+    highlightButton(buttonSelfPinned);
+
     setClassVisibility(CLASS_PINNED_MESSAGE, true);
 
-    if (isCheck) {
-        //Hide not self pinned message
-        const pinnedMessagesToHide = game.messages.contents.filter(entry => checkIsPinned(entry) !== ENUM_IS_PINNED_VALUE.self);
-        const log = getChatLogs();
+    //Hide not self pinned message
+    const pinnedMessagesToHide = game.messages.contents.filter(entry => checkIsPinned(entry) !== ENUM_IS_PINNED_VALUE.self);
+    const chatLogs = document.querySelectorAll(".chat-log");
 
-        for (let i = 0; i < pinnedMessagesToHide.length; i++) {
-            let pinnedMessage = pinnedMessagesToHide[i];
+    for (let i = 0; i < pinnedMessagesToHide.length; i++) {
+        let pinnedMessage = pinnedMessagesToHide[i];
 
-            const htmlMessage = log.find(`.message[data-message-id="${pinnedMessage.id}"]`)
-            if (htmlMessage.length) {
-                htmlMessage.hide()
-            }
-        }
+        const htmlMessages = chatLogs.values().flatMap((log) => log.querySelectorAll(`.message[data-message-id="${pinnedMessage._id}"]`))
+        htmlMessages.forEach((htmlElement) => htmlElement.style.display = "none")
     }
 }
-
-function getChatLogs() {
-    const chatById = $("#chat-log");
-
-    if (chatById.length) return chatById
-
-    const chatByClass = $(".chat-log");
-
-    if (chatByClass.length) return chatByClass
-
-    throw new Error('Unfined chatlog')
-}
-
 
 function setClassVisibility(cssClass, visible) {
-    const element = $('.' + cssClass)
+    const elements = document.querySelectorAll(`.${cssClass}`)
 
-    if (visible) {
-        element.removeClass(CLASS_HARD_HIDE);
-        element.show();
-    } else {
-        element.hide();
-    }
+    elements.forEach((element) => {
+        if (visible) {
+            element.style.display = "";
+        } else {
+            element.style.display = "none";
+        }   
+    })
+};
+
+function highlightButton(button) {
+    buttonDefault.setAttribute("aria-pressed", "false")
+    buttonPinned.setAttribute("aria-pressed", "false")
+    buttonSelfPinned.setAttribute("aria-pressed", "false")
+
+    button.setAttribute("aria-pressed", "true")
 };
