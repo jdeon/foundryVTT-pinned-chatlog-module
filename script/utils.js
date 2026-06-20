@@ -1,6 +1,7 @@
 export const s_MODULE_ID = 'pinned-chat-message';
 export const s_EVENT_NAME = `module.${s_MODULE_ID}`;
 export const PINNED_FOR_ALL = 'all'
+export const PCM_FORCE_DELETE = 'pcmForceDelete';
 
 //CSS
 export const CLASS_CHAT_MESSAGE = 'chat-message'
@@ -31,6 +32,12 @@ export function checkIsPinned(chatMessage){
 export function allowToPinMessage(chatMessage){
     return chatMessage.canUserModify(foundry.documents.collections.Users.instance.current,'update')
         || game.user.role >= game.settings.get(s_MODULE_ID, "minimalRoleToPinnedOther")
+}
+
+export function isProtectedFromDeletion(chatMessage) {
+    return game.user.isGM
+        && game.settings.get(s_MODULE_ID, "protectPinnedFromDeletion")
+        && chatMessage.flags?.pinnedChat?.pinned?.length > 0;
 }
 
 
