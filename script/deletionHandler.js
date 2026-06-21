@@ -22,7 +22,7 @@ async function processPendingProtectedDeletes() {
 
     if (pendingMessages.length === 0) return;
 
-    const dialog = pendingMessages.length === 1 ? singleForceDeleteDialog(pendingMessages[0]) : BulkForceDeleteDialog(pendingMessages.length);
+    const dialog = pendingMessages.length === 1 ? singleForceDeleteDialog(pendingMessages[0]) : bulkForceDeleteDialog(pendingMessages.length);
     const forceDelete = await dialog;
     
     if (forceDelete) {
