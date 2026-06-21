@@ -36,7 +36,7 @@ async function processPendingProtectedDeletes() {
 async function singleForceDeleteDialog(chatMessage) {
     const pinnedBy = getPinnedByLabels(chatMessage).join(", ");
 
-    return Dialog.confirm({
+    return foundry.applications.api.DialogV2.confirm({
         title: game.i18n.localize("PCM.deleteProtected.title"),
         content: `<p>${game.i18n.localize("PCM.deleteProtected.content")}</p>
             <p>${game.i18n.format("PCM.deleteProtected.pinnedBy", { users: pinnedBy })}</p>`,
@@ -54,7 +54,7 @@ function getPinnedByLabels(chatMessage) {
 }
 
 async function bulkForceDeleteDialog(protectedCount) {
-    return Dialog.confirm({
+    return foundry.applications.api.DialogV2.confirm({
         title: game.i18n.localize("PCM.deleteProtectedBulk.title"),
         content: `<p>${game.i18n.format("PCM.deleteProtectedBulk.content", { count: protectedCount })}</p>`,
         defaultYes: false,
