@@ -2,13 +2,10 @@ import { pinnedApi } from "./script/api.js";
 import { addMigrationSettings, migrateModule } from "./script/migrationManager.js"
 import { pinnedMessageUpdate, addPinnedButton, pinnedMessage } from "./script/pinnedMessage.js";
 import { initTab, getCurrentTabId, PINNED_TAB_NAME } from "./script/pinnedTab.js";
+import { queueProtectedDeleteConfirmation } from "./script/deletionHandler.js";
 import { s_MODULE_ID, s_EVENT_NAME, CLASS_PINNED_TAB_MESSAGE, CLASS_PINNED_MESSAGE, ENUM_IS_PINNED_VALUE, PINNED_FOR_ALL, PCM_FORCE_DELETE, checkIsPinned, allowToPinMessage, isProtectedFromDeletion } from "./script/utils.js"
 
 let isChatTab = false;
-
-const PROTECTED_DELETE_DEBOUNCE_MS = 1000;
-const pendingProtectedDeletes = new Map();
-let pendingProtectedDeleteTimer = null;
 
 /***********************************
  * HOOKS LISTENER
@@ -130,50 +127,6 @@ Hooks.on("renderChatMessageHTML", (chatMessage, html, data) => {
         html.style.display = "none";
     }
 });
-
-function queueProtectedDeleteConfirmation(chatMessage) {
-    pendingProtectedDeletes.set(chatMessage.id, chatMessage);
-    scheduleProtectedDeleteDialog();
-}
-
-function scheduleProtectedDeleteDialog() {
-    clearTimeout(pendingProtectedDeleteTimer);
-    pendingProtectedDeleteTimer = setTimeout(processPendingProtectedDeletes, PROTECTED_DELETE_DEBOUNCE_MS);
-}
-
-async function processPendingProtectedDeletes() {
-    pendingProtectedDeleteTimer = null;
-    const pendingMessages = [...pendingProtectedDeletes.values()];
-    pendingProtectedDeletes.clear();
-
-    if (pendingMessages.length === 0) return;
-
-    const dialog = pendingMessages.length === 1 ? singleForceDeleteDialog() : BulkForceDeleteDialog(pendingMessages.length);
-    const forceDelete = await dialog;
-    
-    if (forceDelete) {
-        await ChatMessage.deleteDocuments(
-            pendingMessages.map(message => message.id),
-            { [PCM_FORCE_DELETE]: true }
-        );
-    }
-}
-
-async function singleForceDeleteDialog() {
-    return Dialog.confirm({
-        title: game.i18n.localize("PCM.deleteProtected.title"),
-        content: `<p>${game.i18n.localize("PCM.deleteProtected.content")}</p>`,
-        defaultYes: false,
-    });
-} //TODO: add pinned author to the dialog
-
-async function BulkForceDeleteDialog(protectedCount) {
-    return Dialog.confirm({
-        title: game.i18n.localize("PCM.deleteProtectedBulk.title"),
-        content: `<p>${game.i18n.format("PCM.deleteProtectedBulk.content", { count: protectedCount })}</p>`,
-        defaultYes: false,
-    });
-}
 
 Hooks.on("preDeleteChatMessage", (chatMessage, options) => {
     if (options?.[PCM_FORCE_DELETE] || !isProtectedFromDeletion(chatMessage)) return;
