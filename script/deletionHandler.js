@@ -1,7 +1,7 @@
 import { PCM_FORCE_DELETE, PINNED_FOR_ALL } from "./utils.js"
 
 
-const PROTECTED_DELETE_DEBOUNCE_MS = 1000;
+const PROTECTED_DELETE_DEBOUNCE_MS = 250;
 const pendingProtectedDeletes = new Map();
 let pendingProtectedDeleteTimer = null;
 
