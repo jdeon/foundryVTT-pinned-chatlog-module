@@ -13,6 +13,8 @@
     "PCM.error.cantPinned" : "Vous ne pouvez pas épingler ce message",
     "PCM.deleteProtected.title": "Supprimer le message épinglé ?",
     "PCM.deleteProtected.content": "Ce message est épinglé. Voulez-vous forcer sa suppression ?",
+    "PCM.deleteProtected.pinnedBy": "Épinglé par : {users}",
+    "PCM.deleteProtected.pinnedForAll": "Tout le monde",
     "PCM.deleteProtectedBulk.title": "Supprimer les messages épinglés ?",
     "PCM.deleteProtectedBulk.content": "{count} message(s) épinglé(s) sont inclus dans cette suppression. Voulez-vous forcer leur suppression ?",
     "PCM.allPin": "Epingler pour tous",

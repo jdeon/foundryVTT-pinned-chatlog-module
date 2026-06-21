@@ -1,4 +1,4 @@
-import { PCM_FORCE_DELETE } from "./utils.js"
+import { PCM_FORCE_DELETE, PINNED_FOR_ALL } from "./utils.js"
 
 
 const PROTECTED_DELETE_DEBOUNCE_MS = 1000;
@@ -22,7 +22,7 @@ async function processPendingProtectedDeletes() {
 
     if (pendingMessages.length === 0) return;
 
-    const dialog = pendingMessages.length === 1 ? singleForceDeleteDialog() : BulkForceDeleteDialog(pendingMessages.length);
+    const dialog = pendingMessages.length === 1 ? singleForceDeleteDialog(pendingMessages[0]) : BulkForceDeleteDialog(pendingMessages.length);
     const forceDelete = await dialog;
     
     if (forceDelete) {
@@ -33,15 +33,28 @@ async function processPendingProtectedDeletes() {
     }
 }
 
-async function singleForceDeleteDialog() {
+async function singleForceDeleteDialog(chatMessage) {
+    const pinnedBy = getPinnedByLabels(chatMessage).join(", ");
+
     return Dialog.confirm({
         title: game.i18n.localize("PCM.deleteProtected.title"),
         content: `<p>${game.i18n.localize("PCM.deleteProtected.content")}</p>`,
+        content: `<p>${game.i18n.localize("PCM.deleteProtected.content")}</p>
+            <p>${game.i18n.format("PCM.deleteProtected.pinnedBy", { users: pinnedBy })}</p>`,
         defaultYes: false,
     });
-} //TODO: add pinned author to the dialog
+}
 
-async function BulkForceDeleteDialog(protectedCount) {
+function getPinnedByLabels(chatMessage) {
+    const pinnedUsers = chatMessage.flags?.pinnedChat?.pinned ?? [];
+
+    return pinnedUsers.map(target => {
+        if (target === PINNED_FOR_ALL) return game.i18n.localize("PCM.deleteProtected.pinnedForAll");
+        return game.users.get(target)?.name ?? target;
+    });
+}
+
+async function bulkForceDeleteDialog(protectedCount) {
     return Dialog.confirm({
         title: game.i18n.localize("PCM.deleteProtectedBulk.title"),
         content: `<p>${game.i18n.format("PCM.deleteProtectedBulk.content", { count: protectedCount })}</p>`,
