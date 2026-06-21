@@ -38,7 +38,6 @@ async function singleForceDeleteDialog(chatMessage) {
 
     return Dialog.confirm({
         title: game.i18n.localize("PCM.deleteProtected.title"),
-        content: `<p>${game.i18n.localize("PCM.deleteProtected.content")}</p>`,
         content: `<p>${game.i18n.localize("PCM.deleteProtected.content")}</p>
             <p>${game.i18n.format("PCM.deleteProtected.pinnedBy", { users: pinnedBy })}</p>`,
         defaultYes: false,
