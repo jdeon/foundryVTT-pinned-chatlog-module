@@ -11,6 +11,12 @@
     "PCM.settings.disableSelfPin.name": "Disable the self pinned for player",
     "PCM.settings.disableSelfPin.hint": "Sie können diese Nachricht nicht anpinnen",
     "PCM.error.cantPinned" : "Sie können diese Nachricht nicht anpinnen",
+    "PCM.deleteProtected.title": "Angeheftete Nachricht löschen?",
+    "PCM.deleteProtected.content": "Diese Nachricht ist angeheftet. Möchten Sie sie trotzdem löschen?",
+    "PCM.deleteProtected.pinnedBy": "Angeheftet von: {users}",
+    "PCM.deleteProtected.pinnedForAll": "Alle",
+    "PCM.deleteProtectedBulk.title": "Angeheftete Nachrichten löschen?",
+    "PCM.deleteProtectedBulk.content": "{count} angeheftete Nachricht(en) sind in dieser Löschung enthalten. Möchten Sie sie trotzdem löschen?",
     "PCM.allPin": "Pin für alle",
     "PCM.selfPin": "Pin selbst",
     "PCM.unPin": "Lösen"
