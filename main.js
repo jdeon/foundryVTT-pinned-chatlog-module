@@ -2,7 +2,8 @@ import { pinnedApi } from "./script/api.js";
 import { addMigrationSettings, migrateModule } from "./script/migrationManager.js"
 import { pinnedMessageUpdate, addPinnedButton, pinnedMessage } from "./script/pinnedMessage.js";
 import { initTab, getCurrentTabId, PINNED_TAB_NAME } from "./script/pinnedTab.js";
-import { s_MODULE_ID, s_EVENT_NAME, CLASS_PINNED_TAB_MESSAGE, CLASS_PINNED_MESSAGE, ENUM_IS_PINNED_VALUE, PINNED_FOR_ALL, checkIsPinned, allowToPinMessage } from "./script/utils.js"
+import { queueProtectedDeleteConfirmation } from "./script/deletionHandler.js";
+import { s_MODULE_ID, s_EVENT_NAME, CLASS_PINNED_TAB_MESSAGE, CLASS_PINNED_MESSAGE, ENUM_IS_PINNED_VALUE, PINNED_FOR_ALL, PCM_FORCE_DELETE, checkIsPinned, allowToPinMessage, isProtectedFromDeletion } from "./script/utils.js"
 
 let isChatTab = false;
 
@@ -127,13 +128,11 @@ Hooks.on("renderChatMessageHTML", (chatMessage, html, data) => {
     }
 });
 
-Hooks.on("preDeleteChatMessage", (chatMessage, option) => {
-    //Check pinned message on the flush chat button
-    if (game.user.isGM
-        && game.settings.get(s_MODULE_ID, "protectPinnedFromDeletion")
-        && chatMessage.flags?.pinnedChat?.pinned?.length > 0) {
-        return false
-    }
+Hooks.on("preDeleteChatMessage", (chatMessage, options) => {
+    if (options?.[PCM_FORCE_DELETE] || !isProtectedFromDeletion(chatMessage)) return;
+
+    queueProtectedDeleteConfirmation(chatMessage);
+    return false;
 });
 
 Hooks.on('getChatMessageContextOptions', getChatMessageContextOptions);
