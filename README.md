@@ -19,7 +19,7 @@ By default, you can only pinned message that you owned if you're are not GM. But
 
 ### Protect pinned message from deletion
 Protect pinned message from GM deletion (useful when the chatlog is flushed).
-( It wiil show dialog to force deletion )
+( It will show dialog to force deletion )
 
 ### Disable pinner for player
 There is two settings to disable "pin for all" or/and "self pin". 
